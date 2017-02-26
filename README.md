@@ -1,0 +1,1 @@
+# svg-2-react-icon

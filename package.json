@@ -1,0 +1,46 @@
+{
+  "name": "svg-2-react-icon",
+  "version": "1.0.0",
+  "author": {
+    "name": "Itai Ben David",
+    "email": "itaibd@wix.com",
+    "url": ""
+  },
+  "main": "dist/src/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "wix-node-build start",
+    "pretest": "wix-node-build lint && wix-node-build build",
+    "build": ":",
+    "test": "wix-node-build test",
+    "release": "wix-node-build release"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.22.0"
+  },
+  "private": false,
+  "devDependencies": {
+    "babel-plugin-transform-runtime": "^6.22.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "chai": "^3.5.0",
+    "wix-node-build": "latest"
+  },
+  "babel": {
+    "presets": [
+      "es2015",
+      "stage-0"
+    ],
+    "plugins": [
+      "transform-runtime"
+    ]
+  },
+  "eslintConfig": {
+    "extends": "wix/esnext"
+  },
+  "publishConfig": {
+    "registry": "http://repo.dev.wix/artifactory/api/npm/npm-local/"
+  }
+}
