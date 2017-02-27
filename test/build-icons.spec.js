@@ -1,20 +1,18 @@
 const buildIcons = require('../src/build-icons');
-jest.mock('fs');
+jest.mock('fs-extra');
 jest.mock('svgo');
 jest.mock('glob');
-jest.mock('rimraf');
 jest.mock('../src/svg-optimizer');
 jest.mock('esformatter');
 
 describe('Build icons', () => {
-  let rimrafMock, fsMock, globMock, optimizerMock, esformatterMock;
+  let fsMock, globMock, optimizerMock, esformatterMock;
   let svgFiles;
   const inputDir = '', outputDir = '/dist';
 
   beforeEach(() => {
-    fsMock = require('fs');
+    fsMock = require('fs-extra');
     globMock = require('glob');
-    rimrafMock = require('rimraf');
     optimizerMock = require('../src/svg-optimizer');
     esformatterMock = require('esformatter');
   });
@@ -78,15 +76,21 @@ describe('Build icons', () => {
     expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][0]).toMatch(/.*\/dist\/index\.js$/);
     expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][1]).toEqual(indexJs || '\n');
 
+    expect(fsMock.copySync.mock.calls[0][0]).toMatch(/.*\/icon-base\/Icon\.js/);
+    expect(fsMock.copySync.mock.calls[0][1]).toMatch(/.*\/dist\/Icon\.js/);
+    expect(fsMock.copySync.mock.calls[1][0]).toMatch(/.*\/icon-base\/Icon\.scss/);
+    expect(fsMock.copySync.mock.calls[1][1]).toMatch(/.*\/dist\/Icon\.scss/);
+
     resetMocks();
   };
 
-  it('should clean previous output dir', () => {
+  it('should clean previous output dir and copy base files', () => {
     withSvgFiles();
     const promise = buildIcons(inputDir, outputDir);
 
-    expect(rimrafMock.sync.mock.calls[0][0]).toMatch(/.*\/dist$/);
-    expect(fsMock.mkdirSync.mock.calls[0][0]).toMatch(/.*\/dist/);
+    expect(fsMock.removeSync.mock.calls[0][0]).toMatch(/.*\/dist$/);
+    expect(fsMock.mkdirsSync.mock.calls[0][0]).toMatch(/.*\/dist/);
+    expect(fsMock.mkdirsSync.mock.calls[1][0]).toMatch(/.*\/dist\/components/);
 
     return promise.then(() => {
       expectIconFiles();
