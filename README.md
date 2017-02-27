@@ -22,10 +22,10 @@ In your `package.json`:
 
 ```js
 {
-"scripts": {     
- "build": "svg2react-icon [inputDir] [outputDir]",
- ...
-}
+  "scripts": {     
+    "build": "svg2react-icon [inputDir] [outputDir]",
+    ...
+  }
 }
 ```
 
