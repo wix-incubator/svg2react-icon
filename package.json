@@ -13,7 +13,6 @@
     "svg2react-icon": "./src/index.js",
     "svg2react-icon-once": "./src/build-once.js"
   },
-  ,
   "repository": {
     "type": "git",
     "url": "https://github.com/wix/svg2react-icon"
