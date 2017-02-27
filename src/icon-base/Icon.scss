@@ -1,0 +1,10 @@
+.iconDefault {
+  fill: currentColor;
+  vertical-align: baseline;
+}
+
+:global(.rtl) {
+  .iconDefault {
+    transform: scaleX(-1);
+  }
+}

@@ -1,1 +1,1 @@
-# svg-2-react-icon
+# svg2react-icon
