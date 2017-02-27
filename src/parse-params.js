@@ -3,5 +3,5 @@ const [inputDir, outputDir] = args;
 
 module.exports = {
   inputDir: inputDir || 'src/Icons/raw',
-  outputDir: outputDir || 'src/Icon/dist'
+  outputDir: outputDir || 'src/Icons/dist'
 };
