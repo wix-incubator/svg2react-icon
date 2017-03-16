@@ -7,6 +7,7 @@ const esformatter = require('esformatter');
 const forEach = require('lodash.foreach');
 const camelCase = require('lodash.camelcase');
 const optimizeSVG = require('./svg-optimizer');
+const slash = require('slash');
 esformatter.register(require('esformatter-jsx'));
 
 let components = {};
@@ -71,7 +72,7 @@ function toReactAttributes($el, $) {
 
 createReactComponents = co.wrap(function* (svgPath, outputDir) {
   const name = path.basename(svgPath, '.svg');
-  const location = path.join(componentsDirName, name + '.js');
+  const location = slash(path.join(componentsDirName, name + '.js'));
   try {
     let svg = fs.readFileSync(svgPath, 'utf-8');
     svg = yield optimizeSVG(svg);
@@ -79,7 +80,7 @@ createReactComponents = co.wrap(function* (svgPath, outputDir) {
 
     components[name] = location;
 
-    fs.writeFileSync(path.join(outputDir, location), component, 'utf-8');
+    fs.writeFileSync(slash(path.join(outputDir, location), component, 'utf-8'));
     console.log(`created: ${path.join('.', location)}`);
   } catch (err) {
     console.error(`failed to create svg file for ${name}; Error: ${err}`);
@@ -100,7 +101,7 @@ import Icon from '../Icon';
 
 /*eslint-disable */
 const ${name} = props => (
-  <Icon viewBox="${viewBox}" {...props}>   
+  <Icon viewBox="${viewBox}" {...props}>
     <g>${iconSvg}</g>
   </Icon>
 );
