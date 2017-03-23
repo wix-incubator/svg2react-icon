@@ -18,6 +18,7 @@ describe('Build icons', () => {
   });
 
   const resetMocks = () => {
+    fsMock.copySync.mockReset();
     fsMock.writeFileSync.mockReset();
     esformatterMock.format.mockReset();
     optimizerMock.mockReset();
@@ -78,6 +79,30 @@ describe('Build icons', () => {
 
     expect(fsMock.copySync.mock.calls[0][0]).toMatch(/.*\/icon-base\/Icon\.js/);
     expect(fsMock.copySync.mock.calls[0][1]).toMatch(/.*\/dist\/Icon\.js/);
+    expect(fsMock.copySync.mock.calls[1][0]).toMatch(/.*\/icon-base\/Icon\.scss/);
+    expect(fsMock.copySync.mock.calls[1][1]).toMatch(/.*\/dist\/Icon\.scss/);
+
+    resetMocks();
+  };
+  const expectTypeScriptIconFiles = (...svgFiles) => {
+    const totalFileWriteCount = svgFiles.length + 1;
+    let indexTs = '';
+    expect(esformatterMock.format.mock.calls.length).toEqual(svgFiles.length);
+    expect(optimizerMock.mock.calls.length).toEqual(svgFiles.length);
+    expect(fsMock.writeFileSync.mock.calls.length).toEqual(totalFileWriteCount);
+
+    svgFiles.forEach((val, index) => {
+      const regexp = new RegExp(`.*/components/${val.name}.tsx`);
+      expect(fsMock.writeFileSync.mock.calls[index][0]).toMatch(regexp);
+      expect(fsMock.writeFileSync.mock.calls[index][1]).toMatch(val.expected);
+      indexTs += `export {default as ${val.name}} from './components/${val.name}';\n`;
+    });
+
+    expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][0]).toMatch(/.*\/dist\/index\.ts$/);
+    expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][1]).toEqual(indexTs || '\n');
+
+    expect(fsMock.copySync.mock.calls[0][0]).toMatch(/.*\/icon-base\/Icon\.tsx/);
+    expect(fsMock.copySync.mock.calls[0][1]).toMatch(/.*\/dist\/Icon\.tsx/);
     expect(fsMock.copySync.mock.calls[1][0]).toMatch(/.*\/icon-base\/Icon\.scss/);
     expect(fsMock.copySync.mock.calls[1][1]).toMatch(/.*\/dist\/Icon\.scss/);
 
@@ -178,6 +203,19 @@ describe('Build icons', () => {
 
       return buildIcons(inputDir, outputDir).then(() => {
         expectIconFiles(file1);
+      });
+    });
+
+    it('should create typescript files if isTypeScriptOutput flag is set', () => {
+      const file1 = {
+        name: 'Icon5',
+        raw: `<svg><g stroke="none"><g fill="none"></g></g></svg>`,
+        expected: /stroke="none".*fill="none"/
+      };
+      withSvgFiles(file1);
+
+      return buildIcons(inputDir, outputDir, true).then(() => {
+        expectTypeScriptIconFiles(file1);
       });
     });
   });
