@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as s from './Icon.scss';
 
-const Icon:any = ({children, viewBox, size, width, height}) => (
+const Icon: any = ({children, viewBox, size, width, height}) => (
   <svg
     className={s.iconDefault}
     width={width || size}
