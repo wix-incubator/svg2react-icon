@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as PropTypes from 'prop-types';
 import * as s from './Icon.scss';
 
 const Icon: any = ({children, viewBox, size, width, height}) => (
@@ -17,11 +18,11 @@ Icon.defaultProps = {
 };
 
 Icon.propTypes = {
-  size: React.PropTypes.string,
-  width: React.PropTypes.string,
-  height: React.PropTypes.string,
-  children: React.PropTypes.any,
-  viewBox: React.PropTypes.string.isRequired
+  size: PropTypes.string,
+  width: PropTypes.string,
+  height: PropTypes.string,
+  children: PropTypes.any,
+  viewBox: PropTypes.string.isRequired
 };
 
 export default Icon;
