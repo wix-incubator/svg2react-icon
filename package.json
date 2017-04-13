@@ -37,6 +37,7 @@
     "glob": "^7.1.1",
     "lodash.camelcase": "^4.3.0",
     "lodash.foreach": "^4.5.0",
+    "prop-types": "^15.5.4",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "slash": "^1.0.0",

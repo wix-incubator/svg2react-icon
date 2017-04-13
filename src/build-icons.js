@@ -14,7 +14,7 @@ let components = {};
 let createReactComponents = null;
 const componentsDirName = 'components';
 
-const run = (inputDir, outputDir) => {
+const run = (inputDir, outputDir, isTypeScriptOutput) => {
   components = {};
   return new Promise(resolve => {
     glob(`${inputDir}/**/*.svg`, co.wrap(function* (err, icons) {
@@ -24,10 +24,10 @@ const run = (inputDir, outputDir) => {
       }
 
       cleanPrevious(outputDir);
-      yield Promise.all(icons.map(icon => createReactComponents(icon, outputDir)));
+      yield Promise.all(icons.map(icon => createReactComponents(icon, outputDir, isTypeScriptOutput)));
 
-      createIndexFile(outputDir);
-      copyIconBase(outputDir);
+      createIndexFile(outputDir, isTypeScriptOutput);
+      copyIconBase(outputDir, isTypeScriptOutput);
       resolve();
     }));
   });
@@ -70,13 +70,13 @@ function toReactAttributes($el, $) {
   });
 }
 
-createReactComponents = co.wrap(function* (svgPath, outputDir) {
+createReactComponents = co.wrap(function* (svgPath, outputDir, isTypeScriptOutput) {
   const name = path.basename(svgPath, '.svg');
-  const location = slash(path.join(componentsDirName, name + '.js'));
+  const location = slash(path.join(componentsDirName, name + (isTypeScriptOutput ? '.tsx' : '.js')));
   try {
     let svg = fs.readFileSync(svgPath, 'utf-8');
     svg = yield optimizeSVG(svg);
-    const component = createReactSVG(name, svg);
+    const component = createReactSVG(name, svg, isTypeScriptOutput);
 
     components[name] = location;
 
@@ -87,7 +87,7 @@ createReactComponents = co.wrap(function* (svgPath, outputDir) {
   }
 });
 
-function createReactSVG(name, svg) {
+function createReactSVG(name, svg, isTypeScriptOutput) {
   const $ = cheerio.load(svg, {
     xmlMode: true
   });
@@ -96,7 +96,8 @@ function createReactSVG(name, svg) {
   const iconSvg = $svg.html();
   const viewBox = $svg.attr('viewBox');
 
-  const uglyComponent = `import React from 'react';
+  const uglyComponent = (isTypeScriptOutput ? `import * as React from 'react';` : `import React from 'react';`) +
+     `
 import Icon from '../Icon';
 
 /*eslint-disable */
@@ -113,16 +114,18 @@ export default ${name};
   return esformatter.format(uglyComponent);
 }
 
-function createIndexFile(outputDir) {
+function createIndexFile(outputDir, isTypeScriptOutput) {
+  const suffix = isTypeScriptOutput ? '.ts' : '.js';
   const iconsModule = Object.keys(components).map(name => {
-    const loc = `./${components[name].replace('.js', '')}`;
+    const loc = `./${components[name].replace(/\.tsx|\.js/, '')}`;
     return `export {default as ${name}} from '${loc}';`;
   }).join('\n') + '\n';
-  fs.writeFileSync(path.join(outputDir, 'index.js'), iconsModule, 'utf-8');
-  console.log(path.join('.', 'index.js'));
+  fs.writeFileSync(path.join(outputDir, 'index' + suffix), iconsModule, 'utf-8');
+  console.log(path.join('.', 'index' + suffix));
 }
 
-function copyIconBase(outputDir) {
-  fs.copySync(path.resolve(__dirname, './icon-base/Icon.js'), path.join(outputDir, 'Icon.js'));
+function copyIconBase(outputDir, isTypeScriptOutput) {
+  const suffix = isTypeScriptOutput ? '.tsx' : '.js';
+  fs.copySync(path.resolve(__dirname, './icon-base/Icon' + suffix), path.join(outputDir, 'Icon' + suffix));
   fs.copySync(path.resolve(__dirname, './icon-base/Icon.scss'), path.join(outputDir, 'Icon.scss'));
 }

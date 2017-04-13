@@ -1,8 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import s from './Icon.scss';
+import * as React from 'react';
+import * as PropTypes from 'prop-types';
+import * as s from './Icon.scss';
 
-const Icon = ({children, viewBox, size, width, height}) => (
+const Icon: any = ({children, viewBox, size, width, height}) => (
   <svg
     className={s.iconDefault}
     width={width || size}
