@@ -9,6 +9,7 @@
 * Rename illegal SVG attributes
 * Optimize the SVG (remove comments, unnecessary parts, etc)
 * Remove colors so that the parent's font-color will be cascaded to the icon
+* *Optional* - output TypeScript components
 
 ## Install
 
@@ -23,7 +24,7 @@ In your `package.json`:
 ```js
 {
   "scripts": {     
-    "build": "svg2react-icon [inputDir] [outputDir]",
+    "build": "svg2react-icon [inputDir] [outputDir] [isTypeScript (optional)]",
     ...
   }
 }
@@ -32,7 +33,7 @@ In your `package.json`:
 Or within the command-line:
 
 ```console
-svg2react-icon [inputDir] [outputDir]
+svg2react-icon [inputDir] [outputDir] [isTypeScript (optional)]
 ```
 
 
