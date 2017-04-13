@@ -2,37 +2,52 @@ const fs = require('fs-extra');
 const co = require('co');
 const path = require('path');
 const glob = require('glob');
-const cheerio = require('cheerio');
-const esformatter = require('esformatter');
-const forEach = require('lodash.foreach');
-const camelCase = require('lodash.camelcase');
-const optimizeSVG = require('./svg-optimizer');
-esformatter.register(require('esformatter-jsx'));
+const svg2Component = require('./lib/svg2component');
 
-let components = {};
-let createReactComponents = null;
 const componentsDirName = 'components';
+const processIcons = co.wrap(processIconsGenerator);
+const processIcon = co.wrap(processIconGenerator);
 
-const run = (inputDir, outputDir, isTypeScriptOutput) => {
-  components = {};
-  return new Promise(resolve => {
+module.exports = (inputDir, outputDir, isTypeScriptOutput) => {
+  const buildIconsAsync = resolve => {
     glob(`${inputDir}/**/*.svg`, co.wrap(function* (err, icons) {
       if (err) {
         console.error(err);
         return;
       }
 
-      cleanPrevious(outputDir);
-      yield Promise.all(icons.map(icon => createReactComponents(icon, outputDir, isTypeScriptOutput)));
-
-      createIndexFile(outputDir, isTypeScriptOutput);
-      copyIconBase(outputDir, isTypeScriptOutput);
+      yield processIcons(icons, outputDir, isTypeScriptOutput);
       resolve();
     }));
-  });
+  };
+
+  return new Promise(buildIconsAsync);
 };
 
-module.exports = run;
+function* processIconsGenerator(icons, outputDir, isTypeScriptOutput) {
+  cleanPrevious(outputDir);
+  const iconProcessors = icons.map(icon => processIcon(icon, outputDir, isTypeScriptOutput));
+  const components = yield Promise.all(iconProcessors);
+
+  createIndexFile(components, outputDir, isTypeScriptOutput);
+  copyIconBase(outputDir, isTypeScriptOutput);
+}
+
+function* processIconGenerator(svgPath, outputDir, isTypeScriptOutput) {
+  const component = {};
+  component.name = path.basename(svgPath, '.svg');
+  component.path = path.join(componentsDirName, component.name + (isTypeScriptOutput ? '.tsx' : '.js'));
+  try {
+    const svg = fs.readFileSync(svgPath, 'utf-8');
+    component.raw = yield svg2Component(svg, component.name, isTypeScriptOutput);
+    fs.writeFileSync(path.join(outputDir, component.path), component.raw, 'utf-8');
+    console.log(`created: ${path.join('.', component.path)}`);
+  } catch (err) {
+    console.error(`failed to create svg file for ${component.name}; Error: ${err}`);
+  }
+
+  return component;
+}
 
 const componentsDir = outputDir => path.join(outputDir, componentsDirName);
 function cleanPrevious(outputDir) {
@@ -41,84 +56,13 @@ function cleanPrevious(outputDir) {
   fs.mkdirsSync(componentsDir(outputDir));
 }
 
-const resetIfNotNone = val => val === 'none' ? 'none' : 'currentColor';
-const attributesToRename = {'xlink:href': 'xlinkHref', class: 'className'};
-const attributesToReplace = {fill: resetIfNotNone, stroke: resetIfNotNone};
-
-function toReactAttributes($el, $) {
-  forEach($el.attr(), (val, name) => {
-    if (attributesToReplace[name]) {
-      $el.attr(name, attributesToReplace[name](val));
-    }
-
-    if (name.indexOf('-') === -1 && !attributesToRename[name]) {
-      return;
-    }
-
-    const newName = attributesToRename[name] || camelCase(name);
-    $el.attr(newName, val).removeAttr(name);
-  });
-
-  if ($el.children().length === 0) {
-    return false;
-  }
-
-  $el.children().each((index, el) => {
-    const $child = $(el);
-    toReactAttributes($child, $);
-  });
-}
-
-createReactComponents = co.wrap(function* (svgPath, outputDir, isTypeScriptOutput) {
-  const name = path.basename(svgPath, '.svg');
-  const location = path.join(componentsDirName, name + (isTypeScriptOutput ? '.tsx' : '.js'));
-  try {
-    let svg = fs.readFileSync(svgPath, 'utf-8');
-    svg = yield optimizeSVG(svg);
-    const component = createReactSVG(name, svg, isTypeScriptOutput);
-
-    components[name] = location;
-
-    fs.writeFileSync(path.join(outputDir, location), component, 'utf-8');
-    console.log(`created: ${path.join('.', location)}`);
-  } catch (err) {
-    console.error(`failed to create svg file for ${name}; Error: ${err}`);
-  }
-});
-
-function createReactSVG(name, svg, isTypeScriptOutput) {
-  const $ = cheerio.load(svg, {
-    xmlMode: true
-  });
-  const $svg = $('svg');
-  toReactAttributes($svg, $);
-  const iconSvg = $svg.html();
-  const viewBox = $svg.attr('viewBox');
-
-  const uglyComponent = (isTypeScriptOutput ? `import * as React from 'react';` : `import React from 'react';`) +
-     `
-import Icon from '../Icon';
-
-/*eslint-disable */
-const ${name} = props => (
-  <Icon viewBox="${viewBox}" {...props}>   
-    <g>${iconSvg}</g>
-  </Icon>
-);
-/*eslint-enable */
-
-export default ${name};
-`;
-
-  return esformatter.format(uglyComponent);
-}
-
-function createIndexFile(outputDir, isTypeScriptOutput) {
+function createIndexFile(components, outputDir, isTypeScriptOutput) {
   const suffix = isTypeScriptOutput ? '.ts' : '.js';
-  const iconsModule = Object.keys(components).map(name => {
-    const loc = `./${components[name].replace(/\.tsx|\.js/, '')}`;
-    return `export {default as ${name}} from '${loc}';`;
+  const iconsModule = components.map(component => {
+    const loc = `./${component.path.replace(/\.tsx|\.js/, '')}`;
+    return `export {default as ${component.name}} from '${loc}';`;
   }).join('\n') + '\n';
+
   fs.writeFileSync(path.join(outputDir, 'index' + suffix), iconsModule, 'utf-8');
   console.log(path.join('.', 'index' + suffix));
 }

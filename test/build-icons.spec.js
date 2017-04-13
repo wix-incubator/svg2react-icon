@@ -2,7 +2,7 @@ const buildIcons = require('../src/build-icons');
 jest.mock('fs-extra');
 jest.mock('svgo');
 jest.mock('glob');
-jest.mock('../src/svg-optimizer');
+jest.mock('../src/lib/svg-optimizer');
 jest.mock('esformatter');
 
 describe('Build icons', () => {
@@ -13,7 +13,7 @@ describe('Build icons', () => {
   beforeEach(() => {
     fsMock = require('fs-extra');
     globMock = require('glob');
-    optimizerMock = require('../src/svg-optimizer');
+    optimizerMock = require('../src/lib/svg-optimizer');
     esformatterMock = require('esformatter');
   });
 
