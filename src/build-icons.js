@@ -59,7 +59,7 @@ function cleanPrevious(outputDir) {
 function createIndexFile(components, outputDir, isTypeScriptOutput) {
   const suffix = isTypeScriptOutput ? '.ts' : '.js';
   const iconsModule = components.map(component => {
-    const loc = `./${component.path.replace(/\.tsx|\.js/, '')}`;
+    const loc = `./${component.path.replace(/\\/g, '/').replace(/\.tsx|\.js/, '')}`;
     return `export {default as ${component.name}} from '${loc}';`;
   }).join('\n') + '\n';
 
