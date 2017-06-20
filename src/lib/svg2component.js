@@ -27,8 +27,8 @@ function createReactSVG(name, svg, isTypeScriptOutput) {
 import Icon from '../Icon';
 
 /*eslint-disable */
-const ${name} = props => (
-  <Icon viewBox="${viewBox}" {...props}>   
+const ${name} = (props: any) => (
+  <Icon viewBox="${viewBox}" {...props}>
     <g>${iconSvg}</g>
   </Icon>
 );

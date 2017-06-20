@@ -2,14 +2,14 @@ import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import * as s from './Icon.scss';
 
-const Icon: any = ({children, viewBox, size, width, height}) => (
+const Icon: any = (p:any) => (
   <svg
     className={s.iconDefault}
-    width={width || size}
-    height={height || size}
-    viewBox={viewBox}
+    width={p.width || p.size}
+    height={p.height || p.size}
+    viewBox={p.viewBox}
     >
-    {children}
+    {p.children}
   </svg>
 );
 
