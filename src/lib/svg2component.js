@@ -21,13 +21,13 @@ function createReactSVG(name, svg, isTypeScriptOutput) {
   toReactAttributes($svg, $);
   const iconSvg = $svg.html();
   const viewBox = $svg.attr('viewBox');
-
+  const typeScriptAny = (isTypeScriptOutput ? ': any' : '');
   const uglyComponent = (isTypeScriptOutput ? `import * as React from 'react';` : `import React from 'react';`) +
     `
 import Icon from '../Icon';
 
 /*eslint-disable */
-const ${name} = (props: any) => (
+const ${name} = (props${typeScriptAny}) => (
   <Icon viewBox="${viewBox}" {...props}>
     <g>${iconSvg}</g>
   </Icon>
