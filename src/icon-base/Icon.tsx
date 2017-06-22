@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import * as s from './Icon.scss';
 
-const Icon: any = (p:any) => (
+const Icon: any = (p: any) => (
   <svg
     className={s.iconDefault}
     width={p.width || p.size}
