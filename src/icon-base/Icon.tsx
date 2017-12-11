@@ -5,7 +5,7 @@ import * as s from './Icon.scss';
 const Icon: any = (p: any) => (
   <svg
     id={p.id}
-    className={s.iconDefault}
+    className={`${s.iconDefault} ${p.className}`}
     width={p.width || p.size}
     height={p.height || p.size}
     viewBox={p.viewBox}
@@ -19,6 +19,7 @@ Icon.defaultProps = {
 };
 
 Icon.propTypes = {
+  classname: PropTypes.string,
   id: PropTypes.string,
   size: PropTypes.string,
   width: PropTypes.string,
