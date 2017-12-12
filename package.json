@@ -21,11 +21,11 @@
     "url": "https://github.com/wix/svg2react-icon/issues"
   },
   "scripts": {
-    "start": "yoshi start",
-    "pretest": "yoshi lint && yoshi build",
+    "start": "haste start",
+    "pretest": "haste lint && haste build",
     "build": ":",
-    "test": "yoshi test --jest",
-    "release": "yoshi release"
+    "test": "haste test --jest",
+    "release": "haste release"
   },
   "dependencies": {
     "babel-runtime": "^6.22.0",
@@ -43,7 +43,7 @@
     "svgo": "^0.7.2"
   },
   "devDependencies": {
-    "yoshi": "latest"
+    "haste-preset-yoshi": "latest"
   },
   "jest": {
     "moduleNameMapper": {
@@ -62,5 +62,8 @@
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
+  },
+  "haste": {
+    "preset": "yoshi"
   }
 }
