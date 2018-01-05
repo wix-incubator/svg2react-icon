@@ -27,11 +27,13 @@ function createReactSVG(name, svg, isTypeScriptOutput) {
 import Icon from '../Icon';
 
 /*eslint-disable */
+/*tslint:disable */
 const ${name} = (props${typeScriptAny}) => (
   <Icon viewBox="${viewBox}" {...props}>
     <g>${iconSvg}</g>
   </Icon>
 );
+/*tslint:enable */
 /*eslint-enable */
 
 export default ${name};
