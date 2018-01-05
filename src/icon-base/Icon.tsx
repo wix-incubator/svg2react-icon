@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import * as s from './Icon.scss';
 
+/*tslint:disable*/
 const Icon: any = (p: any) => (
   <svg
     id={p.id}
@@ -29,3 +30,4 @@ Icon.propTypes = {
 };
 
 export default Icon;
+/*tslint:enable*/
