@@ -1,6 +1,9 @@
 const SVGO = require('svgo');
 const svgo = new SVGO({
-  plugins: [{removeStyleElement: {}}]
+  plugins: [
+    {removeStyleElement: {}},
+    {removeTitle: true}
+  ]
 });
 
 const optimizeAsync = svgContent => {
