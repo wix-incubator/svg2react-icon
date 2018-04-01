@@ -27,11 +27,7 @@ describe('Build icons', () => {
   beforeEach(() => {
     resetMocks();
 
-    optimizerMock.mockImplementation(content => {
-      return new Promise(resolve => {
-        resolve(content);
-      });
-    });
+    optimizerMock.mockImplementation(content => Promise.resolve(content));
 
     esformatterMock.format.mockImplementation(obj => obj);
 

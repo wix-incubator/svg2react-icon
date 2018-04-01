@@ -1,73 +1,62 @@
 const fs = require('fs-extra');
-const co = require('co');
 const path = require('path');
 const glob = require('glob');
-const svg2Component = require('./lib/svg2component');
+const svgToComponent = require('./lib/svg2component');
+const optimizeSvg = require('./lib/svg-optimizer');
 
 const componentsDirName = 'components';
-const processIcons = co.wrap(processIconsGenerator);
-const processIcon = co.wrap(processIconGenerator);
 
-module.exports = (inputDir, outputDir, isTypeScriptOutput, monochrome) => {
-  const buildIconsAsync = resolve => {
-    glob(`${inputDir}/**/*.svg`, co.wrap(function* (err, icons) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-
-      yield processIcons(icons, outputDir, isTypeScriptOutput, monochrome);
-      resolve();
-    }));
-  };
-
-  return new Promise(buildIconsAsync);
+module.exports = ({inputDir, outputDir, typescript, monochrome}) => {
+  const icons = glob.sync(`${inputDir}/**/*.svg`);
+  return processIcons(icons, outputDir, typescript, monochrome);
 };
 
-function* processIconsGenerator(icons, outputDir, isTypeScriptOutput, monochrome) {
-  cleanPrevious(outputDir);
-  const iconProcessors = icons.map(icon => processIcon(icon, outputDir, isTypeScriptOutput, monochrome));
-  const components = yield Promise.all(iconProcessors);
+async function processIcons(filenames, outputDir, isTypeScriptOutput, monochrome) {
+  fs.removeSync(outputDir);
+  fs.mkdirsSync(path.join(outputDir, componentsDirName));
 
-  createIndexFile(components, outputDir, isTypeScriptOutput);
+  const componentNames = await Promise.all(
+    filenames.map(icon => processIcon(icon, outputDir, isTypeScriptOutput, monochrome))
+  );
+
+  createIndexFile(componentNames, outputDir, isTypeScriptOutput);
   copyIconBase(outputDir, isTypeScriptOutput);
 }
 
-function* processIconGenerator(svgPath, outputDir, isTypeScriptOutput, monochrome) {
-  const component = {};
-  component.name = path.basename(svgPath, '.svg');
-  component.path = path.join(componentsDirName, component.name + (isTypeScriptOutput ? '.tsx' : '.js'));
+async function processIcon(svgPath, outputDir, isTypeScriptOutput, monochrome) {
+  const name = path.basename(svgPath, '.svg');
+  const filename = name + (isTypeScriptOutput ? '.tsx' : '.js');
+  const relativePath = path.join(componentsDirName, filename);
+  const absolutePath = path.join(outputDir, relativePath);
+
   try {
     const svg = fs.readFileSync(svgPath, 'utf-8');
-    component.raw = yield svg2Component(svg, component.name, isTypeScriptOutput, monochrome);
-    fs.writeFileSync(path.join(outputDir, component.path), component.raw, 'utf-8');
-    console.log(`created: ${path.join('.', component.path)}`);
+    const optimizedSvg = await optimizeSvg(svg, monochrome);
+    const componentCode = svgToComponent(name, optimizedSvg, isTypeScriptOutput);
+    fs.writeFileSync(absolutePath, componentCode, 'utf-8');
+    console.log(`Created: ${relativePath}`);
   } catch (err) {
-    console.error(`failed to create svg file for ${component.name}; Error: ${err}`);
+    console.error(`Failed to create SVG file for ${name}. Error: ${err}`);
   }
 
-  return component;
+  return name;
 }
 
-const componentsDir = outputDir => path.join(outputDir, componentsDirName);
-function cleanPrevious(outputDir) {
-  fs.removeSync(outputDir);
-  fs.mkdirsSync(outputDir);
-  fs.mkdirsSync(componentsDir(outputDir));
-}
+function createIndexFile(componentNames, outputDir, isTypeScriptOutput) {
+  const code = componentNames.map(name =>
+    `export {default as ${name}} from './${componentsDirName}/${name}';`
+  ).join('\n') + '\n';
 
-function createIndexFile(components, outputDir, isTypeScriptOutput) {
-  const suffix = isTypeScriptOutput ? '.ts' : '.js';
-  const iconsModule = components.map(component => {
-    const loc = `./${component.path.replace(/\\/g, '/').replace(/\.tsx|\.js/, '')}`;
-    return `export {default as ${component.name}} from '${loc}';`;
-  }).join('\n') + '\n';
-
-  fs.writeFileSync(path.join(outputDir, 'index' + suffix), iconsModule, 'utf-8');
-  console.log(path.join('.', 'index' + suffix));
+  const filename = 'index' + (isTypeScriptOutput ? '.ts' : '.js');
+  fs.writeFileSync(path.join(outputDir, filename), code, 'utf-8');
+  console.log(`Created: ${filename}`);
 }
 
 function copyIconBase(outputDir, isTypeScriptOutput) {
-  const suffix = isTypeScriptOutput ? '.tsx' : '.js';
-  fs.copySync(path.resolve(__dirname, './icon-base/Icon' + suffix), path.join(outputDir, 'Icon' + suffix));
+  const filename = 'Icon' + (isTypeScriptOutput ? '.tsx' : '.js');
+  fs.copySync(
+    path.resolve(__dirname, 'icon-base', filename),
+    path.join(outputDir, filename)
+  );
+  console.log(`Created: ${filename}`);
 }

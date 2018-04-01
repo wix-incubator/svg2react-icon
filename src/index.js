@@ -3,9 +3,4 @@
 const buildIcons = require('./build-icons');
 const params = require('./lib/parse-params');
 
-buildIcons(
-  params.inputDir,
-  params.outputDir,
-  params.typescript,
-  params.monochrome
-);
+buildIcons(params);

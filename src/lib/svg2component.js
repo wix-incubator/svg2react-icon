@@ -1,19 +1,10 @@
-const co = require('co');
 const cheerio = require('cheerio');
 const forEach = require('lodash.foreach');
 const camelCase = require('lodash.camelcase');
 const esformatter = require('esformatter');
-const optimizeSVG = require('./svg-optimizer');
 esformatter.register(require('esformatter-jsx'));
 
-module.exports = co.wrap(svg2ComponentGenerator);
-
-function* svg2ComponentGenerator(svg, name, isTypeScriptOutput, monochrome) {
-  const optimisedSvg = yield optimizeSVG(svg, monochrome);
-  return createReactSVG(name, optimisedSvg, isTypeScriptOutput);
-}
-
-function createReactSVG(name, svg, isTypeScriptOutput) {
+module.exports = (name, svg, isTypeScriptOutput) => {
   const $ = cheerio.load(svg, {
     xmlMode: true
   });
@@ -26,13 +17,17 @@ function createReactSVG(name, svg, isTypeScriptOutput) {
     `
       import * as React from 'react';
       import Icon, {IconProps} from '../Icon';
-      const ${name}: React.SFC<IconProps> = props => ${svgJsx};
+      const ${name}: React.SFC<IconProps> = props => (
+        ${svgJsx}
+      );
       export default ${name};
     ` :
     `
       import React from 'react';
       import Icon from '../Icon';
-      const ${name} = props => ${svgJsx};
+      const ${name} = props => (
+        ${svgJsx}
+      );
       export default ${name};
     `;
 
@@ -44,7 +39,7 @@ function createReactSVG(name, svg, isTypeScriptOutput) {
     '/* eslint-enable */',
     ''
   ].join('\n');
-}
+};
 
 const resetIfNotNone = val => val === 'none' ? 'none' : 'currentColor';
 const attributesToRename = {'xlink:href': 'xlinkHref', class: 'className'};
