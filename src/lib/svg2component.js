@@ -32,7 +32,7 @@ function createReactSVG(name, svg, isTypeScriptOutput) {
     `
       import React from 'react';
       import Icon from '../Icon';
-      const ${$name} = props => ${svgJsx};
+      const ${name} = props => ${svgJsx};
       export default ${name};
     `;
 

@@ -79,8 +79,6 @@ describe('Build icons', () => {
 
     expect(fsMock.copySync.mock.calls[0][0]).toMatch(/.*\/icon-base\/Icon\.js/);
     expect(fsMock.copySync.mock.calls[0][1]).toMatch(/.*\/dist\/Icon\.js/);
-    expect(fsMock.copySync.mock.calls[1][0]).toMatch(/.*\/icon-base\/Icon\.scss/);
-    expect(fsMock.copySync.mock.calls[1][1]).toMatch(/.*\/dist\/Icon\.scss/);
 
     resetMocks();
   };
@@ -103,8 +101,6 @@ describe('Build icons', () => {
 
     expect(fsMock.copySync.mock.calls[0][0]).toMatch(/.*\/icon-base\/Icon\.tsx/);
     expect(fsMock.copySync.mock.calls[0][1]).toMatch(/.*\/dist\/Icon\.tsx/);
-    expect(fsMock.copySync.mock.calls[1][0]).toMatch(/.*\/icon-base\/Icon\.scss/);
-    expect(fsMock.copySync.mock.calls[1][1]).toMatch(/.*\/dist\/Icon\.scss/);
 
     resetMocks();
   };
