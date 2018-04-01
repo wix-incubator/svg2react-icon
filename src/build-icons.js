@@ -36,7 +36,7 @@ async function processIcon(svgPath, outputDir, isTypeScriptOutput, monochrome) {
     fs.writeFileSync(absolutePath, componentCode, 'utf-8');
     console.log(`Created: ${relativePath}`);
   } catch (err) {
-    console.error(`Failed to create SVG file for ${name}. Error: ${err}`);
+    console.error(`Failed to generate component ${name}. Error: ${err}`);
   }
 
   return name;

@@ -12,13 +12,13 @@ module.exports = (name, svg, isTypeScriptOutput) => {
   toReactAttributes($svg, $);
   const children = $svg.html();
   const viewBox = $svg.attr('viewBox');
-  const svgJsx = `<Icon viewBox="${viewBox}" {...props}>${children}</Icon>`;
+  const iconJsx = `<Icon viewBox="${viewBox}" {...props}>${children}</Icon>`;
   const code = isTypeScriptOutput ?
     `
       import * as React from 'react';
       import Icon, {IconProps} from '../Icon';
       const ${name}: React.SFC<IconProps> = props => (
-        ${svgJsx}
+        ${iconJsx}
       );
       export default ${name};
     ` :
@@ -26,7 +26,7 @@ module.exports = (name, svg, isTypeScriptOutput) => {
       import React from 'react';
       import Icon from '../Icon';
       const ${name} = props => (
-        ${svgJsx}
+        ${iconJsx}
       );
       export default ${name};
     `;
