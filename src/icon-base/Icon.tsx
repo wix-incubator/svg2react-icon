@@ -1,32 +1,27 @@
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
-import * as s from './Icon.scss';
+
+export interface IconProps extends React.SVGAttributes<SVGElement> {
+  size?: string;
+  width?: string;
+  height?: string;
+  fill?: string;
+}
 
 /*tslint:disable*/
-const Icon: any = (p: any) => (
+const Icon: React.SFC<IconProps> = ({children, size, width, height, ...props}) => (
   <svg
-    id={p.id}
-    className={`${s.iconDefault} ${p.className}`}
-    width={p.width || p.size}
-    height={p.height || p.size}
-    viewBox={p.viewBox}
-    >
-    {p.children}
+    {...props}
+    width={width || size}
+    height={height || size}
+  >
+    {children}
   </svg>
 );
 
 Icon.defaultProps = {
-  size: '1em'
-};
-
-Icon.propTypes = {
-  classname: PropTypes.string,
-  id: PropTypes.string,
-  size: PropTypes.string,
-  width: PropTypes.string,
-  height: PropTypes.string,
-  children: PropTypes.any,
-  viewBox: PropTypes.string.isRequired
+  size: '1em',
+  fill: 'currentColor'
 };
 
 export default Icon;

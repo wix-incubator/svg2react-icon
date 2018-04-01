@@ -1,8 +1,14 @@
-const args = process.argv.slice(2);
-const [inputDir, outputDir, isTypeScriptOutput] = args;
+const program = require('commander');
+
+program
+  .arguments('<input-dir> <output-dir>')
+  .option('--monochrome', 'Strip colors from the SVG')
+  .option('--typescript', 'Produce TypeScript output')
+  .parse(process.argv);
 
 module.exports = {
-  inputDir: inputDir || 'src/Icons/raw',
-  outputDir: outputDir || 'src/Icons/dist',
-  isTypeScriptOutput: isTypeScriptOutput || false
+  inputDir: program.args[0] || 'src/Icons/raw',
+  outputDir: program.args[1] || 'src/Icons/dist',
+  monochrome: Boolean(program.monochrome),
+  typescript: Boolean(program.typescript)
 };
