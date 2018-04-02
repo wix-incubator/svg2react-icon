@@ -1,46 +1,45 @@
-const co = require('co');
 const cheerio = require('cheerio');
 const forEach = require('lodash.foreach');
 const camelCase = require('lodash.camelcase');
 const esformatter = require('esformatter');
-const optimizeSVG = require('./svg-optimizer');
 esformatter.register(require('esformatter-jsx'));
 
-module.exports = co.wrap(svg2ComponentGenerator);
-
-function* svg2ComponentGenerator(svg, name, isTypeScriptOutput) {
-  const optimisedSvg = yield optimizeSVG(svg);
-  return createReactSVG(name, optimisedSvg, isTypeScriptOutput);
-}
-
-function createReactSVG(name, svg, isTypeScriptOutput) {
+module.exports = (name, svg, isTypeScriptOutput) => {
   const $ = cheerio.load(svg, {
     xmlMode: true
   });
   const $svg = $('svg');
   toReactAttributes($svg, $);
-  const iconSvg = $svg.html();
+  const children = $svg.html();
   const viewBox = $svg.attr('viewBox');
-  const typeScriptAny = (isTypeScriptOutput ? ': any' : '');
-  const uglyComponent = (isTypeScriptOutput ? `import * as React from 'react';` : `import React from 'react';`) +
+  const iconJsx = `<Icon viewBox="${viewBox}" {...props}>${children}</Icon>`;
+  const code = isTypeScriptOutput ?
     `
-import Icon from '../Icon';
+      import * as React from 'react';
+      import Icon, {IconProps} from '../Icon';
+      const ${name}: React.SFC<IconProps> = props => (
+        ${iconJsx}
+      );
+      export default ${name};
+    ` :
+    `
+      import React from 'react';
+      import Icon from '../Icon';
+      const ${name} = props => (
+        ${iconJsx}
+      );
+      export default ${name};
+    `;
 
-/*eslint-disable */
-/*tslint:disable */
-const ${name} = (props${typeScriptAny}) => (
-  <Icon viewBox="${viewBox}" {...props}>
-    <g>${iconSvg}</g>
-  </Icon>
-);
-/*tslint:enable */
-/*eslint-enable */
-
-export default ${name};
-`;
-
-  return esformatter.format(uglyComponent);
-}
+  return [
+    '/* eslint-disable */',
+    '/* tslint:disable */',
+    esformatter.format(code).trim(),
+    '/* tslint:enable */',
+    '/* eslint-enable */',
+    ''
+  ].join('\n');
+};
 
 const resetIfNotNone = val => val === 'none' ? 'none' : 'currentColor';
 const attributesToRename = {'xlink:href': 'xlinkHref', class: 'className'};

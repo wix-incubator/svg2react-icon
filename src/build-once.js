@@ -5,5 +5,5 @@ const params = require('./lib/parse-params');
 const fs = require('fs');
 
 if (!fs.existsSync(params.outputDir)) {
-  buildIcons(params.inputDir, params.outputDir, params.isTypeScriptOutput);
+  buildIcons(params);
 }

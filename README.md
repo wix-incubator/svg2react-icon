@@ -2,7 +2,7 @@
 
 
 > A library to generate reusable React Icon components from raw SVG icons
- 
+
 ## Features
 
 * Create a React Icon component file for each raw SVG icon file
@@ -23,19 +23,24 @@ In your `package.json`:
 
 ```js
 {
-  "scripts": {     
-    "build": "svg2react-icon [inputDir] [outputDir] [isTypeScript (optional)]",
+  "scripts": {
+    "build": "svg2react-icon [options] <inputDir> <outputDir>",
     ...
   }
 }
 ```
 
-Or within the command-line:
+Or in the command-line:
 
 ```console
-svg2react-icon [inputDir] [outputDir] [isTypeScript (optional)]
+svg2react-icon [options] <inputDir> <outputDir>
 ```
 
+Options:
+```console
+  --typescript    generate TypeScript components instead of JS
+  --monochrome    strip all fill and stroke attributes
+```
 
 ## License
 

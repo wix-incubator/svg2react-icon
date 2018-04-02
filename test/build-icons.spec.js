@@ -8,7 +8,7 @@ jest.mock('esformatter');
 describe('Build icons', () => {
   let fsMock, globMock, optimizerMock, esformatterMock;
   let svgFiles;
-  const inputDir = '', outputDir = '/dist';
+  const inputDir = 'src', outputDir = '/dist';
 
   beforeEach(() => {
     fsMock = require('fs-extra');
@@ -27,11 +27,7 @@ describe('Build icons', () => {
   beforeEach(() => {
     resetMocks();
 
-    optimizerMock.mockImplementation(content => {
-      return new Promise(resolve => {
-        resolve(content);
-      });
-    });
+    optimizerMock.mockImplementation(content => Promise.resolve(content));
 
     esformatterMock.format.mockImplementation(obj => obj);
 
@@ -45,10 +41,7 @@ describe('Build icons', () => {
       throw 'File not found!';
     });
 
-    globMock.mockImplementation((globFilter, handler) => {
-      const fileNames = svgFiles.map(file => file.name);
-      handler(null, fileNames);
-    });
+    globMock.sync.mockImplementation(() => svgFiles.map(file => file.name));
   });
 
   afterEach(() => {
@@ -79,8 +72,6 @@ describe('Build icons', () => {
 
     expect(fsMock.copySync.mock.calls[0][0]).toMatch(/.*\/icon-base\/Icon\.js/);
     expect(fsMock.copySync.mock.calls[0][1]).toMatch(/.*\/dist\/Icon\.js/);
-    expect(fsMock.copySync.mock.calls[1][0]).toMatch(/.*\/icon-base\/Icon\.scss/);
-    expect(fsMock.copySync.mock.calls[1][1]).toMatch(/.*\/dist\/Icon\.scss/);
 
     resetMocks();
   };
@@ -103,19 +94,16 @@ describe('Build icons', () => {
 
     expect(fsMock.copySync.mock.calls[0][0]).toMatch(/.*\/icon-base\/Icon\.tsx/);
     expect(fsMock.copySync.mock.calls[0][1]).toMatch(/.*\/dist\/Icon\.tsx/);
-    expect(fsMock.copySync.mock.calls[1][0]).toMatch(/.*\/icon-base\/Icon\.scss/);
-    expect(fsMock.copySync.mock.calls[1][1]).toMatch(/.*\/dist\/Icon\.scss/);
 
     resetMocks();
   };
 
   it('should clean previous output dir and copy base files', () => {
     withSvgFiles();
-    const promise = buildIcons(inputDir, outputDir);
+    const promise = buildIcons({inputDir, outputDir});
 
     expect(fsMock.removeSync.mock.calls[0][0]).toMatch(/.*\/dist$/);
-    expect(fsMock.mkdirsSync.mock.calls[0][0]).toMatch(/.*\/dist/);
-    expect(fsMock.mkdirsSync.mock.calls[1][0]).toMatch(/.*\/dist\/components/);
+    expect(fsMock.mkdirsSync.mock.calls[0][0]).toMatch(/.*\/dist\/components/);
 
     return promise.then(() => {
       expectIconFiles();
@@ -130,7 +118,7 @@ describe('Build icons', () => {
     };
     withSvgFiles(file1);
 
-    return buildIcons(inputDir, outputDir).then(() => {
+    return buildIcons({inputDir, outputDir}).then(() => {
       expectIconFiles(file1);
     });
   });
@@ -148,7 +136,7 @@ describe('Build icons', () => {
     };
     withSvgFiles(file1, file2);
 
-    return buildIcons(inputDir, outputDir).then(() => {
+    return buildIcons({inputDir, outputDir}).then(() => {
       expectIconFiles(file1, file2);
     });
   });
@@ -162,7 +150,7 @@ describe('Build icons', () => {
       };
       withSvgFiles(file1);
 
-      return buildIcons(inputDir, outputDir).then(() => {
+      return buildIcons({inputDir, outputDir}).then(() => {
         expectIconFiles(file1);
       });
     });
@@ -175,7 +163,7 @@ describe('Build icons', () => {
       };
       withSvgFiles(file1);
 
-      return buildIcons(inputDir, outputDir).then(() => {
+      return buildIcons({inputDir, outputDir}).then(() => {
         expectIconFiles(file1);
       });
     });
@@ -188,12 +176,12 @@ describe('Build icons', () => {
       };
       withSvgFiles(file1);
 
-      return buildIcons(inputDir, outputDir).then(() => {
+      return buildIcons({inputDir, outputDir}).then(() => {
         expectIconFiles(file1);
       });
     });
 
-    it('should keep none value for stoke & fille attributes', () => {
+    it('should keep none value for stroke & fill attributes', () => {
       const file1 = {
         name: 'Icon5',
         raw: `<svg><g stroke="none"><g fill="none"></g></g></svg>`,
@@ -201,12 +189,12 @@ describe('Build icons', () => {
       };
       withSvgFiles(file1);
 
-      return buildIcons(inputDir, outputDir).then(() => {
+      return buildIcons({inputDir, outputDir}).then(() => {
         expectIconFiles(file1);
       });
     });
 
-    it('should create typescript files if isTypeScriptOutput flag is set', () => {
+    it('should create typescript files if typescript flag is set', () => {
       const file1 = {
         name: 'Icon5',
         raw: `<svg><g stroke="none"><g fill="none"></g></g></svg>`,
@@ -214,7 +202,7 @@ describe('Build icons', () => {
       };
       withSvgFiles(file1);
 
-      return buildIcons(inputDir, outputDir, true).then(() => {
+      return buildIcons({inputDir, outputDir, typescript: true}).then(() => {
         expectTypeScriptIconFiles(file1);
       });
     });

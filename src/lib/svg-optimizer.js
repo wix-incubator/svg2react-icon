@@ -1,17 +1,23 @@
 const SVGO = require('svgo');
+
 const svgo = new SVGO({
   plugins: [
-    {removeStyleElement: {}},
-    {removeTitle: true}
+    {removeViewBox: false},
+    {removeStyleElement: true},
+    {removeScriptElement: true}
   ]
 });
 
-const optimizeAsync = svgContent => {
-  return new Promise(resolve => {
-    svgo.optimize(svgContent, result => {
-      resolve(result.data);
-    });
-  });
-};
+const svgoMonochrome = new SVGO({
+  plugins: [
+    {removeViewBox: false},
+    {removeStyleElement: true},
+    {removeScriptElement: true},
+    {removeAttrs: {attrs: '(stroke|fill)'}}
+  ]
+});
 
-module.exports = optimizeAsync;
+module.exports = (svgString, monochrome) =>
+  (monochrome ? svgoMonochrome : svgo)
+  .optimize(svgString)
+  .then(result => result.data);
