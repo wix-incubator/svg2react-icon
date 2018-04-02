@@ -4,7 +4,7 @@
   "author": {
     "name": "Itai Ben David",
     "email": "itaibd@wix.com",
-    "url": ""
+    "url": "https://github.com/wix/svg2react-icon"
   },
   "license": "MIT",
   "main": "src/index.js",
