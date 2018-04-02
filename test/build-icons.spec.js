@@ -8,7 +8,7 @@ jest.mock('esformatter');
 describe('Build icons', () => {
   let fsMock, globMock, optimizerMock, esformatterMock;
   let svgFiles;
-  const inputDir = '', outputDir = '/dist';
+  const inputDir = 'src', outputDir = '/dist';
 
   beforeEach(() => {
     fsMock = require('fs-extra');

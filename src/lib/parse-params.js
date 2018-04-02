@@ -7,8 +7,8 @@ program
   .parse(process.argv);
 
 module.exports = {
-  inputDir: program.args[0] || 'src/Icons/raw',
-  outputDir: program.args[1] || 'src/Icons/dist',
+  inputDir: program.args[0],
+  outputDir: program.args[1],
   monochrome: Boolean(program.monochrome),
   typescript: Boolean(program.typescript)
 };
