@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as PropTypes from 'prop-types';
 
 export interface IconProps extends React.SVGAttributes<SVGElement> {
   size?: string;
