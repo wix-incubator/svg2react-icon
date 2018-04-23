@@ -4,12 +4,12 @@ const camelCase = require('lodash.camelcase');
 const esformatter = require('esformatter');
 esformatter.register(require('esformatter-jsx'));
 
-module.exports = (name, svg, isTypeScriptOutput) => {
+module.exports = (name, svg, isTypeScriptOutput, attributeStrip) => {
   const $ = cheerio.load(svg, {
     xmlMode: true
   });
   const $svg = $('svg');
-  toReactAttributes($svg, $);
+  toReactAttributes($svg, $, attributeStrip);
   const children = $svg.html();
   const viewBox = $svg.attr('viewBox');
   const iconJsx = `<Icon viewBox="${viewBox}" {...props}>${children}</Icon>`;
@@ -45,9 +45,9 @@ const resetIfNotNone = val => val === 'none' ? 'none' : 'currentColor';
 const attributesToRename = {'xlink:href': 'xlinkHref', class: 'className'};
 const attributesToReplace = {fill: resetIfNotNone, stroke: resetIfNotNone};
 
-function toReactAttributes($el, $) {
+function toReactAttributes($el, $, attributeStrip) {
   forEach($el.attr(), (val, name) => {
-    if (attributesToReplace[name]) {
+    if (attributeStrip && attributesToReplace[name]) {
       $el.attr(name, attributesToReplace[name](val));
     }
 
@@ -65,6 +65,6 @@ function toReactAttributes($el, $) {
 
   $el.children().each((index, el) => {
     const $child = $(el);
-    toReactAttributes($child, $);
+    toReactAttributes($child, $, attributeStrip);
   });
 }
