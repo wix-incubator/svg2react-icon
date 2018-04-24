@@ -38,8 +38,9 @@ svg2react-icon [options] <inputDir> <outputDir>
 
 Options:
 ```console
-  --typescript    generate TypeScript components instead of JS
-  --monochrome    strip all fill and stroke attributes
+  --typescript            generate TypeScript components instead of JS
+  --monochrome            strip all fill and stroke attributes
+  --no-strip-attributes   do not strip any attributes (fill, stroke, etc.)
 ```
 
 ## License

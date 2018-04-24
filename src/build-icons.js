@@ -6,27 +6,28 @@ const optimizeSvg = require('./lib/svg-optimizer');
 
 const componentsDirName = 'components';
 
-module.exports = ({inputDir, outputDir, typescript, monochrome}) => {
+module.exports = ({inputDir, outputDir, typescript, monochrome, stripAttributes}) => {
+  stripAttributes = stripAttributes === undefined ? true : stripAttributes;
   if (!inputDir || !outputDir) {
     throw new Error('Input and output dirs not specified');
   }
   const icons = glob.sync(`${inputDir}/**/*.svg`);
-  return processIcons(icons, outputDir, typescript, monochrome);
+  return processIcons(icons, outputDir, typescript, monochrome, stripAttributes);
 };
 
-async function processIcons(filenames, outputDir, isTypeScriptOutput, monochrome) {
+async function processIcons(filenames, outputDir, isTypeScriptOutput, monochrome, stripAttributes) {
   fs.removeSync(outputDir);
   fs.mkdirsSync(path.join(outputDir, componentsDirName));
 
   const componentNames = await Promise.all(
-    filenames.map(icon => processIcon(icon, outputDir, isTypeScriptOutput, monochrome))
+    filenames.map(icon => processIcon(icon, outputDir, isTypeScriptOutput, monochrome, stripAttributes))
   );
 
   createIndexFile(componentNames, outputDir, isTypeScriptOutput);
   copyIconBase(outputDir, isTypeScriptOutput);
 }
 
-async function processIcon(svgPath, outputDir, isTypeScriptOutput, monochrome) {
+async function processIcon(svgPath, outputDir, isTypeScriptOutput, monochrome, stripAttributes) {
   const name = path.basename(svgPath, '.svg');
   const filename = name + (isTypeScriptOutput ? '.tsx' : '.js');
   const relativePath = path.join(componentsDirName, filename);
@@ -34,8 +35,8 @@ async function processIcon(svgPath, outputDir, isTypeScriptOutput, monochrome) {
 
   try {
     const svg = fs.readFileSync(svgPath, 'utf-8');
-    const optimizedSvg = await optimizeSvg(svg, monochrome);
-    const componentCode = svgToComponent(name, optimizedSvg, isTypeScriptOutput);
+    const optimizedSvg = await optimizeSvg(svg, monochrome, stripAttributes);
+    const componentCode = svgToComponent(name, optimizedSvg, isTypeScriptOutput, stripAttributes);
     fs.writeFileSync(absolutePath, componentCode, 'utf-8');
     console.log(`Created: ${relativePath}`);
   } catch (err) {
