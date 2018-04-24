@@ -4,7 +4,7 @@ program
   .arguments('<input-dir> <output-dir>')
   .option('--monochrome', 'Strip colors from the SVG')
   .option('--typescript', 'Produce TypeScript output')
-  .option('--strip-attributes', 'Strip some attributes (fill and stroke at least; defaults to enabled, use --no-strip-attributes to disable)')
+  .option('--no-strip-attributes', 'Do not strip any attributes (fill, stroke, etc.)')
   .parse(process.argv);
 
 module.exports = {
