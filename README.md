@@ -1,7 +1,6 @@
 # svg2react-icon
 
-
-> A library to generate reusable React Icon components from raw SVG icons
+> A command to generate reusable React Icon components from raw SVG icons
 
 ## Features
 
