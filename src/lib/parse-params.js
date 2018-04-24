@@ -11,6 +11,6 @@ module.exports = {
   inputDir: program.args[0],
   outputDir: program.args[1],
   monochrome: Boolean(program.monochrome),
-  attributeStrip: program.stripAttributes === undefined ? undefined : Boolean(program.stripAttributes),
+  stripAttributes: program.stripAttributes === undefined ? undefined : Boolean(program.stripAttributes),
   typescript: Boolean(program.typescript)
 };

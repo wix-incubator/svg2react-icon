@@ -189,7 +189,7 @@ describe('Build icons', () => {
       };
       withSvgFiles(file1);
 
-      return buildIcons({inputDir, outputDir, attributeStrip: false}).then(() => {
+      return buildIcons({inputDir, outputDir, stripAttributes: false}).then(() => {
         expectIconFiles(file1);
       });
     });
