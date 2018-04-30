@@ -6,7 +6,7 @@ const Icon = ({children, size, width, height, ...props}) => (
     {...props}
     width={width || size}
     height={height || size}
-    >
+  >
     {children}
   </svg>
 );
