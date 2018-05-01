@@ -59,15 +59,6 @@
     "extends": "wix/react",
     "env": {
       "jest": true
-    },
-    "rules": {
-      "react/jsx-closing-bracket-location": [
-        "error",
-        {
-          "nonEmpty": "tag-aligned",
-          "selfClosing": false
-        }
-      ]
     }
   },
   "publishConfig": {
