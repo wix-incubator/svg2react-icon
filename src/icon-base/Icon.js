@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -6,7 +7,7 @@ const Icon = ({children, size, width, height, ...props}) => (
     {...props}
     width={width || size}
     height={height || size}
-    >
+  >
     {children}
   </svg>
 );
