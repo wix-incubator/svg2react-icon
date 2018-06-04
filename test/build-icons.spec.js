@@ -70,9 +70,6 @@ describe('Build icons', () => {
     expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][0]).toMatch(/.*\/dist\/index\.js$/);
     expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][1]).toEqual(indexJs || '\n');
 
-    expect(fsMock.copySync.mock.calls[0][0]).toMatch(/.*\/icon-base\/Icon\.js/);
-    expect(fsMock.copySync.mock.calls[0][1]).toMatch(/.*\/dist\/Icon\.js/);
-
     resetMocks();
   };
   const expectTypeScriptIconFiles = (...svgFiles) => {
@@ -91,9 +88,6 @@ describe('Build icons', () => {
 
     expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][0]).toMatch(/.*\/dist\/index\.ts$/);
     expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][1]).toEqual(indexTs || '\n');
-
-    expect(fsMock.copySync.mock.calls[0][0]).toMatch(/.*\/icon-base\/Icon\.tsx/);
-    expect(fsMock.copySync.mock.calls[0][1]).toMatch(/.*\/dist\/Icon\.tsx/);
 
     resetMocks();
   };
@@ -204,6 +198,32 @@ describe('Build icons', () => {
 
       return buildIcons({inputDir, outputDir, typescript: true}).then(() => {
         expectTypeScriptIconFiles(file1);
+      });
+    });
+
+    it('should save width and height attributes', () => {
+      const file1 = {
+        name: 'Icon7',
+        raw: `<svg width="24" height="24" viewBox="0 0 24 24"><polygon points="12"/></svg>`,
+        expected: /widthFromSvg = 24 || '1em'/
+      };
+      withSvgFiles(file1);
+
+      return buildIcons({inputDir, outputDir}).then(() => {
+        expectIconFiles(file1);
+      });
+    });
+
+    it('should hide width or height attributes when width or height not defined', () => {
+      const file1 = {
+        name: 'Icon8',
+        raw: `<svg viewBox="0 0 24 24"><polygon points="12"/></svg>`,
+        expected: /widthFromSvg = undefined || '1em'/
+      };
+      withSvgFiles(file1);
+
+      return buildIcons({inputDir, outputDir}).then(() => {
+        expectIconFiles(file1);
       });
     });
   });

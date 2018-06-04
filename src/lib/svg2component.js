@@ -11,23 +11,45 @@ module.exports = (name, svg, isTypeScriptOutput) => {
   const $svg = $('svg');
   toReactAttributes($svg, $);
   const children = $svg.html();
-  const viewBox = $svg.attr('viewBox');
-  const iconJsx = `<Icon viewBox="${viewBox}" {...props}>${children}</Icon>`;
+  const viewBox = $svg.attr('viewBox') ? `viewBox="${$svg.attr('viewBox')}"` : '';
+  const widthFromSvg = $svg.attr('width') || '1em';
+  const heightFromSvg = $svg.attr('width') || '1em';
   const code = isTypeScriptOutput ?
     `
       import * as React from 'react';
-      import Icon, {IconProps} from '../Icon';
-      const ${name}: React.SFC<IconProps> = props => (
-        ${iconJsx}
+      export interface ${name}Props extends React.SVGAttributes<SVGElement> {
+        size?: string;
+      }
+      const ${name}: React.SFC<${name}Props> = props => (
+        <svg
+          ${viewBox}
+          fill="currentColor"
+          width={props.size || ${widthFromSvg}}
+          height={props.size || ${heightFromSvg}}
+          {...props}
+        >
+          ${children}
+        </svg>
       );
       export default ${name};
     ` :
     `
+      import PropTypes from 'prop-types';
       import React from 'react';
-      import Icon from '../Icon';
       const ${name} = props => (
-        ${iconJsx}
+        <svg
+          ${viewBox}
+          fill="currentColor"
+          width={props.size || ${widthFromSvg}}
+          height={props.size || ${heightFromSvg}}
+          {...props}
+        >
+          ${children}
+        </svg>
       );
+      ${name}.propTypes = {
+        size: PropTypes.string
+      }
       export default ${name};
     `;
 
