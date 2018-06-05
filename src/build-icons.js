@@ -23,7 +23,6 @@ async function processIcons(filenames, outputDir, isTypeScriptOutput, monochrome
   );
 
   createIndexFile(componentNames, outputDir, isTypeScriptOutput);
-  copyIconBase(outputDir, isTypeScriptOutput);
 }
 
 async function processIcon(svgPath, outputDir, isTypeScriptOutput, monochrome) {
@@ -52,14 +51,5 @@ function createIndexFile(componentNames, outputDir, isTypeScriptOutput) {
 
   const filename = 'index' + (isTypeScriptOutput ? '.ts' : '.js');
   fs.writeFileSync(path.join(outputDir, filename), code, 'utf-8');
-  console.log(`Created: ${filename}`);
-}
-
-function copyIconBase(outputDir, isTypeScriptOutput) {
-  const filename = 'Icon' + (isTypeScriptOutput ? '.tsx' : '.js');
-  fs.copySync(
-    path.resolve(__dirname, 'icon-base', filename),
-    path.join(outputDir, filename)
-  );
   console.log(`Created: ${filename}`);
 }
