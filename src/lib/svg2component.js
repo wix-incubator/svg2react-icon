@@ -13,19 +13,19 @@ module.exports = (name, svg, isTypeScriptOutput) => {
   const children = $svg.html();
   const viewBox = $svg.attr('viewBox') ? `viewBox="${$svg.attr('viewBox')}"` : '';
   const widthFromSvg = $svg.attr('width') || '1em';
-  const heightFromSvg = $svg.attr('width') || '1em';
+  const heightFromSvg = $svg.attr('height') || '1em';
   const code = isTypeScriptOutput ?
     `
       import * as React from 'react';
       export interface ${name}Props extends React.SVGAttributes<SVGElement> {
         size?: string;
       }
-      const ${name}: React.SFC<${name}Props> = props => (
+      const ${name}: React.SFC<${name}Props> = ({size, ...props}) => (
         <svg
           ${viewBox}
           fill="currentColor"
-          width={props.size || ${widthFromSvg}}
-          height={props.size || ${heightFromSvg}}
+          width={size || "${widthFromSvg}"}
+          height={size || "${heightFromSvg}"}
           {...props}
         >
           ${children}
@@ -36,12 +36,12 @@ module.exports = (name, svg, isTypeScriptOutput) => {
     `
       import PropTypes from 'prop-types';
       import React from 'react';
-      const ${name} = props => (
+      const ${name} = ({size, ...props}) => (
         <svg
           ${viewBox}
           fill="currentColor"
-          width={props.size || ${widthFromSvg}}
-          height={props.size || ${heightFromSvg}}
+          width={size || "${widthFromSvg}"}
+          height={size || "${heightFromSvg}"}
           {...props}
         >
           ${children}
