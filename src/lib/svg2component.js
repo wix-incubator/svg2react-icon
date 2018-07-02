@@ -31,6 +31,7 @@ module.exports = (name, svg, isTypeScriptOutput) => {
           ${children}
         </svg>
       );
+      ${name}.displayName = '${name}';
       export default ${name};
     ` :
     `
@@ -47,6 +48,7 @@ module.exports = (name, svg, isTypeScriptOutput) => {
           ${children}
         </svg>
       );
+      ${name}.displayName = '${name}';
       ${name}.propTypes = {
         size: PropTypes.string
       }
