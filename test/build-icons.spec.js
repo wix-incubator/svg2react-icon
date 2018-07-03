@@ -226,5 +226,33 @@ describe('Build icons', () => {
         expectIconFiles(file1);
       });
     });
+
+    describe('`displayName`', () => {
+      it('should be included in javascript', () => {
+        const file1 = {
+          name: 'IAmTheOneWhoKnocks',
+          raw: `<svg viewBox="0 0 24 24"><polygon points="12"/></svg>`,
+          expected: /IAmTheOneWhoKnocks.displayName = 'IAmTheOneWhoKnocks';/
+        };
+        withSvgFiles(file1);
+
+        return buildIcons({inputDir, outputDir}).then(() => {
+          expectIconFiles(file1);
+        });
+      });
+
+      it('should be included in typescript', () => {
+        const file1 = {
+          name: 'IAmTheOneWhoTypes',
+          raw: `<svg viewBox="0 0 24 24"><polygon points="12"/></svg>`,
+          expected: /IAmTheOneWhoTypes.displayName = 'IAmTheOneWhoTypes';/
+        };
+        withSvgFiles(file1);
+
+        return buildIcons({inputDir, outputDir, typescript: true}).then(() => {
+          expectTypeScriptIconFiles(file1);
+        });
+      });
+    });
   });
 });
