@@ -53,7 +53,7 @@ describe('Build icons', () => {
     svgFiles = [...files];
   };
 
-  const expectIconFiles = (...svgFiles) => {
+  const expectIconFiles = (svgFiles = [], options = {}) => {
     const totalFileWriteCount = svgFiles.length + 1;
     let indexJs = '';
     expect(esformatterMock.format.mock.calls.length).toEqual(svgFiles.length);
@@ -61,33 +61,28 @@ describe('Build icons', () => {
     expect(fsMock.writeFileSync.mock.calls.length).toEqual(totalFileWriteCount);
 
     svgFiles.forEach((val, index) => {
-      const regexp = new RegExp(`.*/components/${val.name}.js`);
-      expect(fsMock.writeFileSync.mock.calls[index][0]).toMatch(regexp);
-      expect(fsMock.writeFileSync.mock.calls[index][1]).toMatch(val.expected);
-      indexJs += `export {default as ${val.name}} from './components/${val.name}';\n`;
-    });
+      const filePath = fsMock.writeFileSync.mock.calls[index][0];
+      const fileContent = fsMock.writeFileSync.mock.calls[index][1];
+      const regexp = new RegExp(`.*/components/${val.name}.${options.typescript ? 'ts' : 'js'}`);
 
-    expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][0]).toMatch(/.*\/dist\/index\.js$/);
+      expect(filePath).toMatch(regexp);
+      val.expects.forEach(expected => {
+        if (expected instanceof RegExp) {
+          expect(fileContent).toMatch(expected);
+        } else {
+          expect(fileContent).not.toMatch(expected.not);
+        }
+      });
+
+      if (options.namedExport) {
+        indexJs += `export {${val.name}} from './components/${val.name}';\n`;
+      } else {
+        indexJs += `export {default as ${val.name}} from './components/${val.name}';\n`;
+      }
+    });
+    const regexp = new RegExp(`.*/dist/index.${options.typescript ? 'ts' : 'js'}$`);
+    expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][0]).toMatch(regexp);
     expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][1]).toEqual(indexJs || '\n');
-
-    resetMocks();
-  };
-  const expectTypeScriptIconFiles = (...svgFiles) => {
-    const totalFileWriteCount = svgFiles.length + 1;
-    let indexTs = '';
-    expect(esformatterMock.format.mock.calls.length).toEqual(svgFiles.length);
-    expect(optimizerMock.mock.calls.length).toEqual(svgFiles.length);
-    expect(fsMock.writeFileSync.mock.calls.length).toEqual(totalFileWriteCount);
-
-    svgFiles.forEach((val, index) => {
-      const regexp = new RegExp(`.*/components/${val.name}.tsx`);
-      expect(fsMock.writeFileSync.mock.calls[index][0]).toMatch(regexp);
-      expect(fsMock.writeFileSync.mock.calls[index][1]).toMatch(val.expected);
-      indexTs += `export {default as ${val.name}} from './components/${val.name}';\n`;
-    });
-
-    expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][0]).toMatch(/.*\/dist\/index\.ts$/);
-    expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][1]).toEqual(indexTs || '\n');
 
     resetMocks();
   };
@@ -108,12 +103,12 @@ describe('Build icons', () => {
     const file1 = {
       name: 'Icon1',
       raw: '<svg><g></g></svg>',
-      expected: /export default Icon1;/
+      expects: [/export default Icon1;/]
     };
     withSvgFiles(file1);
 
     return buildIcons({inputDir, outputDir}).then(() => {
-      expectIconFiles(file1);
+      expectIconFiles([file1]);
     });
   });
 
@@ -121,17 +116,17 @@ describe('Build icons', () => {
     const file1 = {
       name: 'Icon1',
       raw: '<svg><g></g></svg>',
-      expected: /export default Icon1;/
+      expects: [/export default Icon1;/]
     };
     const file2 = {
       name: 'Icon2',
       raw: '<svg><g></g></svg>',
-      expected: /export default Icon2;/
+      expects: [/export default Icon2;/]
     };
     withSvgFiles(file1, file2);
 
     return buildIcons({inputDir, outputDir}).then(() => {
-      expectIconFiles(file1, file2);
+      expectIconFiles([file1, file2]);
     });
   });
 
@@ -140,12 +135,12 @@ describe('Build icons', () => {
       const file1 = {
         name: 'Icon2',
         raw: `<svg><g first-attr="val1"><g second-attr="val2"></g></g></svg>`,
-        expected: /firstAttr="val1".*secondAttr="val2"/
+        expects: [/firstAttr="val1".*secondAttr="val2"/]
       };
       withSvgFiles(file1);
 
       return buildIcons({inputDir, outputDir}).then(() => {
-        expectIconFiles(file1);
+        expectIconFiles([file1]);
       });
     });
 
@@ -153,12 +148,12 @@ describe('Build icons', () => {
       const file1 = {
         name: 'Icon3',
         raw: `<svg><g xlink:href="link"><g class="class"></g></g></svg>`,
-        expected: /xlinkHref="link".*className="class"/
+        expects: [/xlinkHref="link".*className="class"/]
       };
       withSvgFiles(file1);
 
       return buildIcons({inputDir, outputDir}).then(() => {
-        expectIconFiles(file1);
+        expectIconFiles([file1]);
       });
     });
 
@@ -166,12 +161,12 @@ describe('Build icons', () => {
       const file1 = {
         name: 'Icon4',
         raw: `<svg><g fill="#000000"><g stroke="#FFF"></g></g></svg>`,
-        expected: /fill="currentColor".*stroke="currentColor"/
+        expects: [/fill="currentColor".*stroke="currentColor"/]
       };
       withSvgFiles(file1);
 
       return buildIcons({inputDir, outputDir}).then(() => {
-        expectIconFiles(file1);
+        expectIconFiles([file1]);
       });
     });
 
@@ -179,12 +174,12 @@ describe('Build icons', () => {
       const file1 = {
         name: 'Icon5',
         raw: `<svg><g stroke="none"><g fill="none"></g></g></svg>`,
-        expected: /stroke="none".*fill="none"/
+        expects: [/stroke="none".*fill="none"/]
       };
       withSvgFiles(file1);
 
       return buildIcons({inputDir, outputDir}).then(() => {
-        expectIconFiles(file1);
+        expectIconFiles([file1]);
       });
     });
 
@@ -192,12 +187,12 @@ describe('Build icons', () => {
       const file1 = {
         name: 'Icon5',
         raw: `<svg><g stroke="none"><g fill="none"></g></g></svg>`,
-        expected: /stroke="none".*fill="none"/
+        expects: [/stroke="none".*fill="none"/]
       };
       withSvgFiles(file1);
 
       return buildIcons({inputDir, outputDir, typescript: true}).then(() => {
-        expectTypeScriptIconFiles(file1);
+        expectIconFiles([file1], {typescript: true});
       });
     });
 
@@ -205,12 +200,12 @@ describe('Build icons', () => {
       const file1 = {
         name: 'Icon7',
         raw: `<svg width="24" height="24" viewBox="0 0 24 24"><polygon points="12"/></svg>`,
-        expected: /widthFromSvg = 24 || '1em'/
+        expects: [/widthFromSvg = 24 || '1em'/]
       };
       withSvgFiles(file1);
 
       return buildIcons({inputDir, outputDir}).then(() => {
-        expectIconFiles(file1);
+        expectIconFiles([file1]);
       });
     });
 
@@ -218,12 +213,12 @@ describe('Build icons', () => {
       const file1 = {
         name: 'Icon8',
         raw: `<svg viewBox="0 0 24 24"><polygon points="12"/></svg>`,
-        expected: /widthFromSvg = undefined || '1em'/
+        expects: [/widthFromSvg = undefined || '1em'/]
       };
       withSvgFiles(file1);
 
       return buildIcons({inputDir, outputDir}).then(() => {
-        expectIconFiles(file1);
+        expectIconFiles([file1]);
       });
     });
 
@@ -232,12 +227,12 @@ describe('Build icons', () => {
         const file1 = {
           name: 'IAmTheOneWhoKnocks',
           raw: `<svg viewBox="0 0 24 24"><polygon points="12"/></svg>`,
-          expected: /IAmTheOneWhoKnocks.displayName = 'IAmTheOneWhoKnocks';/
+          expects: [/IAmTheOneWhoKnocks.displayName = 'IAmTheOneWhoKnocks';/]
         };
         withSvgFiles(file1);
 
         return buildIcons({inputDir, outputDir}).then(() => {
-          expectIconFiles(file1);
+          expectIconFiles([file1]);
         });
       });
 
@@ -245,13 +240,47 @@ describe('Build icons', () => {
         const file1 = {
           name: 'IAmTheOneWhoTypes',
           raw: `<svg viewBox="0 0 24 24"><polygon points="12"/></svg>`,
-          expected: /IAmTheOneWhoTypes.displayName = 'IAmTheOneWhoTypes';/
+          expects: [/IAmTheOneWhoTypes.displayName = 'IAmTheOneWhoTypes';/]
         };
         withSvgFiles(file1);
 
         return buildIcons({inputDir, outputDir, typescript: true}).then(() => {
-          expectTypeScriptIconFiles(file1);
+          expectIconFiles([file1], {typescript: true});
         });
+      });
+    });
+  });
+
+  describe('named-export', () => {
+    it('should generate named exports - javascript', () => {
+      const file1 = {
+        name: 'Icon5',
+        raw: `<svg><g stroke="none"><g fill="none"></g></g></svg>`,
+        expects: [
+          /export const Icon5/,
+          {not: /export default/}
+        ]
+      };
+      withSvgFiles(file1);
+
+      return buildIcons({inputDir, outputDir, namedExport: true}).then(() => {
+        expectIconFiles([file1], {namedExport: true});
+      });
+    });
+
+    it('should generate named exports - typescript', () => {
+      const file1 = {
+        name: 'Icon5',
+        raw: `<svg><g stroke="none"><g fill="none"></g></g></svg>`,
+        expects: [
+          /export const Icon5/,
+          {not: /export default/}
+        ]
+      };
+      withSvgFiles(file1);
+
+      return buildIcons({inputDir, outputDir, typescript: true, namedExport: true}).then(() => {
+        expectIconFiles([file1], {typescript: true, namedExport: true});
       });
     });
   });

@@ -40,6 +40,7 @@ Options:
 ```console
   --typescript    generate TypeScript components instead of JS
   --monochrome    strip all fill and stroke attributes
+  --namedExport   use named export instead of export default
 ```
 
 ## License

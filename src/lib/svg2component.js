@@ -4,7 +4,7 @@ const camelCase = require('lodash.camelcase');
 const esformatter = require('esformatter');
 esformatter.register(require('esformatter-jsx'));
 
-module.exports = (name, svg, isTypeScriptOutput) => {
+module.exports = (name, svg, options) => {
   const $ = cheerio.load(svg, {
     xmlMode: true
   });
@@ -14,13 +14,13 @@ module.exports = (name, svg, isTypeScriptOutput) => {
   const viewBox = $svg.attr('viewBox') ? `viewBox="${$svg.attr('viewBox')}"` : '';
   const widthFromSvg = $svg.attr('width') || '1em';
   const heightFromSvg = $svg.attr('height') || '1em';
-  const code = isTypeScriptOutput ?
+  const code = options.isTypeScriptOutput ?
     `
       import * as React from 'react';
       export interface ${name}Props extends React.SVGAttributes<SVGElement> {
         size?: string;
       }
-      const ${name}: React.SFC<${name}Props> = ({size, ...props}) => (
+      ${options.namedExport ? 'export ' : ''}const ${name}: React.SFC<${name}Props> = ({size, ...props}) => (
         <svg
           ${viewBox}
           fill="currentColor"
@@ -32,12 +32,12 @@ module.exports = (name, svg, isTypeScriptOutput) => {
         </svg>
       );
       ${name}.displayName = '${name}';
-      export default ${name};
+      ${options.namedExport ? '' : `export default ${name};`}
     ` :
     `
       import PropTypes from 'prop-types';
       import React from 'react';
-      const ${name} = ({size, ...props}) => (
+      ${options.namedExport ? 'export ' : ''}const ${name} = ({size, ...props}) => (
         <svg
           ${viewBox}
           fill="currentColor"
@@ -52,7 +52,7 @@ module.exports = (name, svg, isTypeScriptOutput) => {
       ${name}.propTypes = {
         size: PropTypes.string
       }
-      export default ${name};
+      ${options.namedExport ? '' : `export default ${name};`}
     `;
 
   return [
