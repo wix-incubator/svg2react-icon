@@ -4,7 +4,8 @@ const svgo = new SVGO({
   plugins: [
     {removeViewBox: false},
     {removeStyleElement: true},
-    {removeScriptElement: true}
+    {removeScriptElement: true},
+    {cleanupIDs: false}
   ]
 });
 
@@ -13,6 +14,7 @@ const svgoMonochrome = new SVGO({
     {removeViewBox: false},
     {removeStyleElement: true},
     {removeScriptElement: true},
+    {cleanupIDs: false},
     {removeAttrs: {attrs: '(stroke|fill)'}}
   ]
 });
