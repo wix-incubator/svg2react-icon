@@ -38,7 +38,7 @@
     "lodash.camelcase": "^4.3.0",
     "lodash.foreach": "^4.5.0",
     "prop-types": "^15.5.4",
-    "svgo": "^1.0.5"
+    "svgo": "^1.1.0"
   },
   "devDependencies": {
     "@types/react": "^15.6.15",
