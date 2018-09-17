@@ -19,7 +19,7 @@ const svgoMonochrome = new SVGO({
   ]
 });
 
-module.exports = (svgString, monochrome) =>
+module.exports = (svgString, monochrome, info = {}) =>
   (monochrome ? svgoMonochrome : svgo)
-    .optimize(svgString, {})
+    .optimize(svgString, info)
     .then(result => result.data);
