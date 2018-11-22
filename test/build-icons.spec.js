@@ -80,6 +80,15 @@ describe('Build icons', () => {
         indexJs += `export {default as ${val.name}} from './components/${val.name}';\n`;
       }
     });
+
+    if (indexJs) {
+      indexJs = '/* eslint-disable */\n' +
+        '/* tslint:disable */\n' +
+        indexJs +
+        '/* tslint:enable */\n' +
+        '/* eslint-enable */\n';
+    }
+
     const regexp = new RegExp(`.*/dist/index.${options.typescript ? 'ts' : 'js'}$`);
     expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][0]).toMatch(regexp);
     expect(fsMock.writeFileSync.mock.calls[totalFileWriteCount - 1][1]).toEqual(indexJs || '\n');

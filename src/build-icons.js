@@ -45,9 +45,16 @@ async function processIcon(svgPath, outputDir, options) {
 }
 
 function createIndexFile(componentNames, outputDir, options) {
-  const code = componentNames.map(name =>
-    `export {${options.namedExport ? '' : 'default as '}${name}} from './${componentsDirName}/${name}';`
-  ).join('\n') + '\n';
+  const code = componentNames.length ? [
+    '/* eslint-disable */',
+    '/* tslint:disable */',
+    componentNames.map(name =>
+      `export {${options.namedExport ? '' : 'default as '}${name}} from './${componentsDirName}/${name}';`
+    ).join('\n'),
+    '/* tslint:enable */',
+    '/* eslint-enable */',
+    ''
+  ].join('\n') : '\n';
 
   const filename = 'index' + (options.isTypeScriptOutput ? '.ts' : '.js');
   fs.writeFileSync(path.join(outputDir, filename), code, 'utf-8');
