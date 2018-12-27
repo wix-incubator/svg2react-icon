@@ -23,7 +23,6 @@ module.exports = (name, svg, options) => {
       ${options.namedExport ? 'export ' : ''}const ${name}: React.SFC<${name}Props> = ({size, ...props}) => (
         <svg
           ${viewBox}
-          fill="currentColor"
           width={size || "${widthFromSvg}"}
           height={size || "${heightFromSvg}"}
           {...props}
@@ -40,7 +39,6 @@ module.exports = (name, svg, options) => {
       ${options.namedExport ? 'export ' : ''}const ${name} = ({size, ...props}) => (
         <svg
           ${viewBox}
-          fill="currentColor"
           width={size || "${widthFromSvg}"}
           height={size || "${heightFromSvg}"}
           {...props}
@@ -65,7 +63,7 @@ module.exports = (name, svg, options) => {
   ].join('\n');
 };
 
-const resetIfNotNone = val => val === 'none' ? 'none' : 'currentColor';
+const resetIfNotNone = val => val === 'none' ? 'none' : val;
 const attributesToRename = {'xlink:href': 'xlinkHref', class: 'className'};
 const attributesToReplace = {fill: resetIfNotNone, stroke: resetIfNotNone};
 
