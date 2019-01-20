@@ -5,7 +5,8 @@ const svgo = new SVGO({
     {removeViewBox: false},
     {removeStyleElement: true},
     {removeScriptElement: true},
-    {cleanupIDs: false}
+    {cleanupIDs: false},
+    {convertPathData: false}
   ]
 });
 
@@ -15,7 +16,8 @@ const svgoMonochrome = new SVGO({
     {removeStyleElement: true},
     {removeScriptElement: true},
     {cleanupIDs: false},
-    {removeAttrs: {attrs: '(stroke|fill)'}}
+    {removeAttrs: {attrs: '(stroke|fill)'}},
+    {convertPathData: false}
   ]
 });
 
