@@ -192,6 +192,19 @@ describe('Build icons', () => {
       });
     });
 
+    it('should not replace fill & stroke attributes with current color value, if flad is set', () => {
+      const file1 = {
+        name: 'Icon4',
+        raw: `<svg><g fill="#000000"><g stroke="#FFF"></g></g></svg>`,
+        expects: [/fill="#000000".*stroke="#FFF"/]
+      };
+      withSvgFiles(file1);
+
+      return buildIcons({inputDir, outputDir, keepColors: true}).then(() => {
+        expectIconFiles([file1], {keepColors: true});
+      });
+    });
+
     it('should create typescript files if typescript flag is set', () => {
       const file1 = {
         name: 'Icon5',

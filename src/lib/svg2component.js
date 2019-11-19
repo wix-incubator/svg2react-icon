@@ -9,7 +9,8 @@ module.exports = (name, svg, options) => {
     xmlMode: true
   });
   const $svg = $('svg');
-  toReactAttributes($svg, $);
+  const attributeConverter = createAttributeConverter(options);
+  attributeConverter($svg, $);
   const children = $svg.html();
   const viewBox = $svg.attr('viewBox') ? `viewBox="${$svg.attr('viewBox')}"` : '';
   const widthFromSvg = $svg.attr('width') || '1em';
@@ -66,29 +67,34 @@ module.exports = (name, svg, options) => {
 };
 
 const resetIfNotNone = val => val === 'none' ? 'none' : 'currentColor';
-const attributesToRename = {'xlink:href': 'xlinkHref', class: 'className'};
-const attributesToReplace = {fill: resetIfNotNone, stroke: resetIfNotNone};
 
-function toReactAttributes($el, $) {
-  forEach($el.attr(), (val, name) => {
-    if (attributesToReplace[name]) {
-      $el.attr(name, attributesToReplace[name](val));
+function createAttributeConverter(options) {
+  const attributesToReplace = options.keepColors ? {} : {fill: resetIfNotNone, stroke: resetIfNotNone};
+  const attributesToRename = {'xlink:href': 'xlinkHref', class: 'className'};
+
+  function toReactAttributes($el, $) {
+    forEach($el.attr(), (val, name) => {
+      if (attributesToReplace[name]) {
+        $el.attr(name, attributesToReplace[name](val));
+      }
+
+      if (name.indexOf('-') === -1 && !attributesToRename[name]) {
+        return;
+      }
+
+      const newName = attributesToRename[name] || camelCase(name);
+      $el.attr(newName, val).removeAttr(name);
+    });
+
+    if ($el.children().length === 0) {
+      return false;
     }
 
-    if (name.indexOf('-') === -1 && !attributesToRename[name]) {
-      return;
-    }
-
-    const newName = attributesToRename[name] || camelCase(name);
-    $el.attr(newName, val).removeAttr(name);
-  });
-
-  if ($el.children().length === 0) {
-    return false;
+    $el.children().each((index, el) => {
+      const $child = $(el);
+      toReactAttributes($child, $);
+    });
   }
 
-  $el.children().each((index, el) => {
-    const $child = $(el);
-    toReactAttributes($child, $);
-  });
+  return toReactAttributes;
 }
