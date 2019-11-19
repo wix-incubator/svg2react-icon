@@ -6,12 +6,12 @@ const optimizeSvg = require('./lib/svg-optimizer');
 
 const componentsDirName = 'components';
 
-module.exports = ({inputDir, outputDir, typescript, monochrome, namedExport}) => {
+module.exports = ({inputDir, outputDir, typescript, monochrome, namedExport, keepColors}) => {
   if (!inputDir || !outputDir) {
     throw new Error('Input and output dirs not specified');
   }
   const icons = glob.sync(`${inputDir}/**/*.svg`);
-  return processIcons(icons, outputDir, {isTypeScriptOutput: typescript, monochrome, namedExport});
+  return processIcons(icons, outputDir, {isTypeScriptOutput: typescript, monochrome, namedExport, keepColors});
 };
 
 async function processIcons(filenames, outputDir, options) {

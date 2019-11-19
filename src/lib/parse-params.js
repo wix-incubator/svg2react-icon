@@ -5,6 +5,7 @@ program
   .option('--monochrome', 'Strip colors from the SVG')
   .option('--typescript', 'Produce TypeScript output')
   .option('--named-export', 'Produce named export')
+  .option('--keep-colors', 'Keep SVG fill and stroke colors')
   .parse(process.argv);
 
 module.exports = {
@@ -12,5 +13,6 @@ module.exports = {
   outputDir: program.args[1],
   monochrome: Boolean(program.monochrome),
   typescript: Boolean(program.typescript),
-  namedExport: Boolean(program.namedExport)
+  namedExport: Boolean(program.namedExport),
+  keepColors: Boolean(program.keepColors)
 };
