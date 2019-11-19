@@ -192,7 +192,7 @@ describe('Build icons', () => {
       });
     });
 
-    it('should not replace fill & stroke attributes with current color value, if flad is set', () => {
+    it('should not replace fill & stroke attributes with current color value, if `keepColors` flag is set', () => {
       const file1 = {
         name: 'Icon4',
         raw: `<svg><g fill="#000000"><g stroke="#FFF"></g></g></svg>`,
@@ -201,7 +201,20 @@ describe('Build icons', () => {
       withSvgFiles(file1);
 
       return buildIcons({inputDir, outputDir, keepColors: true}).then(() => {
-        expectIconFiles([file1], {keepColors: true});
+        expectIconFiles([file1]);
+      });
+    });
+
+    it('doesn\'t replace fill & stroke attributes with current color value, with `keepColors` flag, even if `monochrome` is set', () => {
+      const file1 = {
+        name: 'Icon4',
+        raw: `<svg><g fill="#000000"><g stroke="#FFF"></g></g></svg>`,
+        expects: [/fill="#000000".*stroke="#FFF"/]
+      };
+      withSvgFiles(file1);
+
+      return buildIcons({inputDir, outputDir, keepColors: true, monochrome: true}).then(() => {
+        expectIconFiles([file1]);
       });
     });
 
