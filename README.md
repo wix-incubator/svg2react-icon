@@ -41,6 +41,7 @@ Options:
   --typescript    generate TypeScript components instead of JS
   --monochrome    strip all fill and stroke attributes
   --named-export   use named export instead of export default
+  --keep-colors   keep svg fill and stroke colors
 ```
 
 ## License
