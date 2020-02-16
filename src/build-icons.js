@@ -4,17 +4,23 @@ const glob = require('glob');
 const svgToComponent = require('./lib/svg2component');
 const optimizeSvg = require('./lib/svg-optimizer');
 
-module.exports = ({inputDir, outputDir, typescript, monochrome, namedExport, keepColors}) => {
+const COMPONENTS_DIR_NAME = 'components';
+
+function getIconsPath(outputDir, options) {
+  return options.noSubDir ? outputDir : path.join(outputDir, COMPONENTS_DIR_NAME);
+}
+
+module.exports = ({inputDir, outputDir, typescript, monochrome, namedExport, keepColors, noSubDir}) => {
   if (!inputDir || !outputDir) {
     throw new Error('Input and output dirs not specified');
   }
   const icons = glob.sync(`${inputDir}/**/*.svg`);
-  return processIcons(icons, outputDir, {isTypeScriptOutput: typescript, monochrome, namedExport, keepColors});
+  return processIcons(icons, outputDir, {isTypeScriptOutput: typescript, monochrome, namedExport, keepColors, noSubDir});
 };
 
 async function processIcons(filenames, outputDir, options) {
   fs.removeSync(outputDir);
-  fs.mkdirsSync(outputDir);
+  fs.mkdirsSync(getIconsPath(outputDir, options));
 
   const componentNames = await Promise.all(
     filenames.map(icon => processIcon(icon, outputDir, options))
@@ -26,14 +32,14 @@ async function processIcons(filenames, outputDir, options) {
 async function processIcon(svgPath, outputDir, options) {
   const name = path.basename(svgPath, '.svg');
   const filename = name + (options.isTypeScriptOutput ? '.tsx' : '.js');
-  const absolutePath = path.join(outputDir, filename);
+  const iconsPath = path.join(getIconsPath(outputDir, options), filename);
 
   try {
     const svg = fs.readFileSync(svgPath, 'utf-8');
     const optimizedSvg = await optimizeSvg(svg, options.monochrome);
     const componentCode = svgToComponent(name, optimizedSvg, options);
-    fs.writeFileSync(absolutePath, componentCode, 'utf-8');
-    console.log(`Created: ${filename}`);
+    fs.writeFileSync(iconsPath, componentCode, 'utf-8');
+    console.log(`Created: ${iconsPath}`);
   } catch (err) {
     console.error(`Failed to generate component ${name}. Error: ${err}`);
   }
@@ -46,7 +52,7 @@ function createIndexFile(componentNames, outputDir, options) {
     '/* eslint-disable */',
     '/* tslint:disable */',
     componentNames.map(name =>
-      `export {${options.namedExport ? '' : 'default as '}${name}} from './${name}';`
+      `export {${options.namedExport ? '' : 'default as '}${name}} from '.${options.noSubDir ? '' : `/${COMPONENTS_DIR_NAME}`}/${name}';`
     ).join('\n'),
     '/* tslint:enable */',
     '/* eslint-enable */',
