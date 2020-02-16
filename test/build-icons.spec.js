@@ -63,7 +63,7 @@ describe('Build icons', () => {
     svgFiles.forEach((val, index) => {
       const filePath = fsMock.writeFileSync.mock.calls[index][0];
       const fileContent = fsMock.writeFileSync.mock.calls[index][1];
-      const regexp = new RegExp(`.*/components/${val.name}.${options.typescript ? 'ts' : 'js'}`);
+      const regexp = new RegExp(`.*/${val.name}.${options.typescript ? 'ts' : 'js'}`);
 
       expect(filePath).toMatch(regexp);
       val.expects.forEach(expected => {
@@ -75,9 +75,9 @@ describe('Build icons', () => {
       });
 
       if (options.namedExport) {
-        indexJs += `export {${val.name}} from './components/${val.name}';\n`;
+        indexJs += `export {${val.name}} from './${val.name}';\n`;
       } else {
-        indexJs += `export {default as ${val.name}} from './components/${val.name}';\n`;
+        indexJs += `export {default as ${val.name}} from './${val.name}';\n`;
       }
     });
 
@@ -101,7 +101,7 @@ describe('Build icons', () => {
     const promise = buildIcons({inputDir, outputDir});
 
     expect(fsMock.removeSync.mock.calls[0][0]).toMatch(/.*\/dist$/);
-    expect(fsMock.mkdirsSync.mock.calls[0][0]).toMatch(/.*\/dist\/components/);
+    expect(fsMock.mkdirsSync.mock.calls[0][0]).toMatch(/.*\/dist/);
 
     return promise.then(() => {
       expectIconFiles();
