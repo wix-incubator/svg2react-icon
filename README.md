@@ -36,12 +36,29 @@ Or in the command-line:
 svg2react-icon [options] <inputDir> <outputDir>
 ```
 
+By default, the files that will be generated are:
+
+```
+outputDir
+|
++ -- index.ts
+|
++ -- components
+    |
+    Icon1.tsx
+    ... 
+```
+
+By using the `--no-dub-dir` the `index` file and all the icons will be 
+generated in the `outputDir` without the extra `components` folder. 
+
 Options:
 ```console
   --typescript    generate TypeScript components instead of JS
   --monochrome    strip all fill and stroke attributes
-  --named-export   use named export instead of export default
+  --named-export  use named export instead of export default
   --keep-colors   keep svg fill and stroke colors
+  --no-sub-dir    Output index file and components all inside the output directory
 ```
 
 ## License
