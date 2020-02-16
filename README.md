@@ -49,7 +49,7 @@ outputDir
     ... 
 ```
 
-By using the `--no-dub-dir` the `index` file and all the icons will be 
+By using the `--no-sub-dir` the `index` file and all the icons will be 
 generated in the `outputDir` without the extra `components` folder. 
 
 Options:
