@@ -6,6 +6,7 @@ program
   .option('--typescript', 'Produce TypeScript output')
   .option('--named-export', 'Produce named export')
   .option('--keep-colors', 'Keep SVG fill and stroke colors')
+  .option('--no-sub-dir', 'Output index file and components all inside the output directory')
   .parse(process.argv);
 
 module.exports = {
@@ -14,5 +15,6 @@ module.exports = {
   monochrome: Boolean(program.monochrome),
   typescript: Boolean(program.typescript),
   namedExport: Boolean(program.namedExport),
-  keepColors: Boolean(program.keepColors)
+  keepColors: Boolean(program.keepColors),
+  noSubDir: Boolean(program.noSubDir)
 };

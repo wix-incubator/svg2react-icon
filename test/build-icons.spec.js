@@ -63,7 +63,8 @@ describe('Build icons', () => {
     svgFiles.forEach((val, index) => {
       const filePath = fsMock.writeFileSync.mock.calls[index][0];
       const fileContent = fsMock.writeFileSync.mock.calls[index][1];
-      const regexp = new RegExp(`.*/components/${val.name}.${options.typescript ? 'ts' : 'js'}`);
+      const subDir = options.noSubDir ? '' : '/components';
+      const regexp = new RegExp(`${subDir}/${val.name}.${options.typescript ? 'ts' : 'js'}`);
 
       expect(filePath).toMatch(regexp);
       val.expects.forEach(expected => {
@@ -74,11 +75,7 @@ describe('Build icons', () => {
         }
       });
 
-      if (options.namedExport) {
-        indexJs += `export {${val.name}} from './components/${val.name}';\n`;
-      } else {
-        indexJs += `export {default as ${val.name}} from './components/${val.name}';\n`;
-      }
+      indexJs += `export {${options.namedExport ? '' : 'default as '}${val.name}} from '.${subDir}/${val.name}';\n`;
     });
 
     if (indexJs) {
@@ -101,7 +98,7 @@ describe('Build icons', () => {
     const promise = buildIcons({inputDir, outputDir});
 
     expect(fsMock.removeSync.mock.calls[0][0]).toMatch(/.*\/dist$/);
-    expect(fsMock.mkdirsSync.mock.calls[0][0]).toMatch(/.*\/dist\/components/);
+    expect(fsMock.mkdirsSync.mock.calls[0][0]).toMatch(/.*\/dist/);
 
     return promise.then(() => {
       expectIconFiles();
@@ -316,6 +313,21 @@ describe('Build icons', () => {
 
       return buildIcons({inputDir, outputDir, typescript: true, namedExport: true}).then(() => {
         expectIconFiles([file1], {typescript: true, namedExport: true});
+      });
+    });
+  });
+
+  describe('no-sub-dir', () => {
+    it('should generate all files in one folder without sub directory', () => {
+      const file1 = {
+        name: 'Icon1',
+        raw: '<svg><g></g></svg>',
+        expects: [/export default Icon1;/]
+      };
+      withSvgFiles(file1);
+
+      return buildIcons({inputDir, outputDir, noSubDir: true}).then(() => {
+        expectIconFiles([file1], {noSubDir: true});
       });
     });
   });
