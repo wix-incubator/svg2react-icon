@@ -45,6 +45,7 @@
     "@types/react": "^15.6.15",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "rimraf": "^3.0.2",
     "yoshi": "^2.1.5"
   },
   "jest": {

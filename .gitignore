@@ -5,3 +5,4 @@ target
 maven
 .idea
 .history
+test/output

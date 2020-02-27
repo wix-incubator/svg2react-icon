@@ -16,5 +16,5 @@ module.exports = {
   typescript: Boolean(program.typescript),
   namedExport: Boolean(program.namedExport),
   keepColors: Boolean(program.keepColors),
-  noSubDir: Boolean(program.noSubDir)
+  subDir: Boolean(program.subDir)
 };

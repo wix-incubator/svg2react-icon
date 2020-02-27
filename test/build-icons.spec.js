@@ -63,7 +63,7 @@ describe('Build icons', () => {
     svgFiles.forEach((val, index) => {
       const filePath = fsMock.writeFileSync.mock.calls[index][0];
       const fileContent = fsMock.writeFileSync.mock.calls[index][1];
-      const subDir = options.noSubDir ? '' : '/components';
+      const subDir = options.subDir ? '/components' : '';
       const regexp = new RegExp(`${subDir}/${val.name}.${options.typescript ? 'ts' : 'js'}`);
 
       expect(filePath).toMatch(regexp);
@@ -326,8 +326,8 @@ describe('Build icons', () => {
       };
       withSvgFiles(file1);
 
-      return buildIcons({inputDir, outputDir, noSubDir: true}).then(() => {
-        expectIconFiles([file1], {noSubDir: true});
+      return buildIcons({inputDir, outputDir, subDir: false}).then(() => {
+        expectIconFiles([file1], {subDir: false});
       });
     });
   });
