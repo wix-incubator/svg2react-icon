@@ -96,7 +96,7 @@ describe('index', () => {
   });
 
   describe('--no-sub-dir', () => {
-    it('should create file with named export', done => {
+    it('should create file in output dir, without "components" sub dir', done => {
       spawnSync('node', createCommand(['--no-sub-dir']));
       const filePath = path.resolve('.', OUTPUT_FILE, 'test.js');
 
