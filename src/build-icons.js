@@ -7,15 +7,15 @@ const optimizeSvg = require('./lib/svg-optimizer');
 const COMPONENTS_DIR_NAME = 'components';
 
 function getIconsPath(outputDir, options) {
-  return options.noSubDir ? outputDir : path.join(outputDir, COMPONENTS_DIR_NAME);
+  return options.subDir ? path.join(outputDir, COMPONENTS_DIR_NAME) : outputDir;
 }
 
-module.exports = ({inputDir, outputDir, typescript, monochrome, namedExport, keepColors, noSubDir}) => {
+module.exports = ({inputDir, outputDir, typescript, monochrome, namedExport, keepColors, subDir}) => {
   if (!inputDir || !outputDir) {
     throw new Error('Input and output dirs not specified');
   }
   const icons = glob.sync(`${inputDir}/**/*.svg`);
-  return processIcons(icons, outputDir, {isTypeScriptOutput: typescript, monochrome, namedExport, keepColors, noSubDir});
+  return processIcons(icons, outputDir, {isTypeScriptOutput: typescript, monochrome, namedExport, keepColors, subDir});
 };
 
 async function processIcons(filenames, outputDir, options) {
@@ -52,7 +52,7 @@ function createIndexFile(componentNames, outputDir, options) {
     '/* eslint-disable */',
     '/* tslint:disable */',
     componentNames.map(name =>
-      `export {${options.namedExport ? '' : 'default as '}${name}} from '.${options.noSubDir ? '' : `/${COMPONENTS_DIR_NAME}`}/${name}';`
+      `export {${options.namedExport ? '' : 'default as '}${name}} from '.${options.subDir ? `/${COMPONENTS_DIR_NAME}` : ''}/${name}';`
     ).join('\n'),
     '/* tslint:enable */',
     '/* eslint-enable */',
