@@ -19,9 +19,9 @@ module.exports = (name, svg, options) => {
     `
       import * as React from 'react';
       export interface ${name}Props extends React.SVGAttributes<SVGElement> {
-        size?: string;
+        size?: string | number;
       }
-      ${options.namedExport ? 'export ' : ''}const ${name}: React.SFC<${name}Props> = ({size, ...props}) => (
+      ${options.namedExport ? 'export ' : ''}const ${name}: React.FC<${name}Props> = ({size, ...props}) => (
         <svg
           ${viewBox}
           fill="currentColor"
