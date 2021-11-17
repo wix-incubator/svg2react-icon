@@ -46,7 +46,7 @@
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "rimraf": "^3.0.2",
-    "@wix/yoshi": "^2.1.5"
+    "@wix/yoshi": "^4.0.0"
   },
   "jest": {
     "moduleNameMapper": {
@@ -58,7 +58,6 @@
     ]
   },
   "eslintConfig": {
-    "extends": "wix/react",
     "env": {
       "jest": true
     }
