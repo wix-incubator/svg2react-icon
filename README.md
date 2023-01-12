@@ -1,7 +1,26 @@
 # svg2react-icon
 
+---
+📌 **Deprecation Notice**
 
-> A library to generate reusable React Icon components from raw SVG icons
+
+```diff
+- As of 1.1.2023 This repository is deprecated!
+- It is no longer maintained by Components.
+```
+
+Feel free to 
+If you need react compatible icons please install [@wix/wix-ui-icons-common](https://github.com/wix-private/wix-design-systems-utils/tree/master/packages/wix-ui-icons-common)
+
+---
+
+---
+
+---
+
+---
+
+A library to generate reusable React Icon components from raw SVG icons
 
 ## Features
 
