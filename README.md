@@ -9,7 +9,6 @@
 - It is no longer maintained by Components.
 ```
 
-Feel free to 
 If you need react compatible icons please install [@wix/wix-ui-icons-common](https://github.com/wix-private/wix-design-systems-utils/tree/master/packages/wix-ui-icons-common)
 
 ---
